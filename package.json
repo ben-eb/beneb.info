@@ -1,8 +1,7 @@
 {
   "name": "beneb.info",
   "version": "4.0.0",
-  "description": "Personal portfolio site.",
-  "main": "index.js",
+  "description": "Personal blog.",
   "author": "Ben Briggs",
   "devDependencies": {
     "chalk": "^0.5.1",
