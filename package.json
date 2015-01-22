@@ -1,0 +1,43 @@
+{
+  "name": "beneb.info",
+  "version": "4.0.0",
+  "description": "Personal portfolio site.",
+  "main": "index.js",
+  "author": "Ben Briggs",
+  "devDependencies": {
+    "chalk": "^0.5.1",
+    "ecstatic": "^0.5.8",
+    "glob": "^4.3.5",
+    "gulp": "^3.8.10",
+    "gulp-autoprefixer": "^2.1.0",
+    "gulp-combine-mq": "^0.3.1",
+    "gulp-css-condense": "^1.0.0",
+    "gulp-csso": "^0.2.9",
+    "gulp-cssshrink": "^0.1.4",
+    "gulp-more-css": "^1.0.0",
+    "gulp-ruby-sass": "^1.0.0-alpha",
+    "gulp-uncss": "^0.5.2",
+    "handlebars": "^2.0.0",
+    "is-absolute-url": "^1.0.0",
+    "lazypipe": "^0.2.2",
+    "metalsmith": "^1.0.1",
+    "metalsmith-branch": "0.0.4",
+    "metalsmith-code-highlight": "ben-eb/metalsmith-code-highlight#scope-highlightjs",
+    "metalsmith-collections": "^0.6.0",
+    "metalsmith-drafts": "0.0.1",
+    "metalsmith-filemetadata": "0.0.4",
+    "metalsmith-html-minifier": "^1.1.0",
+    "metalsmith-markdown": "ben-eb/metalsmith-markdown#expose-marked",
+    "metalsmith-permalinks": "^0.4.0",
+    "metalsmith-tags": "^0.6.1",
+    "metalsmith-templates": "^0.6.0",
+    "metalsmith-widow": "^1.0.0",
+    "metalsmith-word-count": "0.0.4",
+    "minimist": "^1.1.0",
+    "moment": "^2.9.0"
+  },
+  "scripts": {
+    "compile": "gulp compile --production",
+    "develop": "gulp watch --silent &"
+  }
+}

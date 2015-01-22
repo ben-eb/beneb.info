@@ -1,0 +1,59 @@
+/**
+ * Font styles
+ */
+
+$font-family-sans-serif: Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif;
+$headings-font-family: Bitter, Georgia, Times New Roman, Times, serif;
+$font-size-base: 18px;
+$line-height-base: 1.75;
+$line-height-computed: floor(($font-size-base * $line-height-base));
+
+/**
+ * Global background/text colours
+ */
+
+$body-bg: hsla(186, 20%, 95%, 1);
+$text-color: hsla(186, 20%, 40%, 1);
+
+/**
+ * Links and tags
+ */
+
+$link-color: hsla(223, 60%, 25%, 1);
+$link-hover-color: hsla(186, 60%, 25%, 1);
+$label-default-bg: hsla(223, 60%, 25%, 1);
+$label-default-hover-color: $link-hover-color;
+
+/**
+ * Page header styles
+ */
+
+$page-header-border-color: hsla(186, 20%, 90%, 1);
+
+/**
+ * Inline & block code elements
+ */
+
+$pre-bg: #1d1f21;
+$pre-color: #c5c8c6;
+$code-bg: hsla(186, 20%, 90%, 1);
+$code-color: darken($pre-color, 50%);
+
+/**
+ * Navbar component
+ */
+
+$navbar-default-bg: #fff;
+$navbar-default-border: $page-header-border-color;
+$navbar-height: 100px;
+$navbar-margin-bottom: $line-height-computed * 2;
+$navbar-default-link-color: $link-color;
+$navbar-default-link-hover-color: $link-hover-color;
+$navbar-default-brand-hover-color: $link-hover-color;
+
+/**
+ * Import bootstrap's variables and mixins
+ */
+
+@import 'bootstrap/variables';
+@import 'bootstrap/mixins';

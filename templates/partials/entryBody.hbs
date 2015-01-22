@@ -1,0 +1,32 @@
+<div class="row">
+    <article class="col-lg-9">
+        {{{ contents }}}
+    </article>
+    <aside class="col-lg-3">
+        <div class="row">
+            {{#ifDaySame stats.mtime date }}
+                <div class="col-sm-3 col-lg-12">
+                    <h4 class="meta-description">Published</h4>
+                    <p  class="meta-description--contents">{{ format_date stats.mtime }}</p>
+                </div>
+            {{else}}
+                <div class="col-sm-3 col-lg-12">
+                    <h4 class="meta-description">First published</h4>
+                    <p  class="meta-description--contents">{{ format_date_only date }}</p>
+                </div>
+                <div class="col-sm-3 col-lg-12">
+                    <h4 class="meta-description">Last updated</h4>
+                    <p  class="meta-description--contents">{{ format_date stats.mtime }}</p>
+                </div>
+            {{/ifDaySame}}
+            <div class="col-sm-3 col-lg-12">
+                <h4 class="meta-description">Estimated reading time</h4>
+                <p  class="meta-description--contents">{{ readingTime }} ({{ wordCount }} words)</p>
+            </div>
+            <div class="col-sm-3 col-lg-12">
+                <h4 class="meta-description">Topics</h4>
+                <p>{{#each tags}} {{{ link_to_topic this }}} {{/each}}</p>
+            </div>
+        </div>
+    </aside>
+</div>

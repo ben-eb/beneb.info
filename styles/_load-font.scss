@@ -1,0 +1,11 @@
+$font_directory: '../fonts/' !default;
+
+@mixin load_font($name, $location, $weight: normal, $style: normal) {
+    @font-face {
+        font-family: $name;
+        src: url('#{$font_directory}#{$location}.woff2') format('woff2'),
+             url('#{$font_directory}#{$location}.woff') format('woff');
+        font-weight: $weight;
+        font-style: $style;
+    }
+}

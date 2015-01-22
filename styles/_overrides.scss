@@ -1,0 +1,29 @@
+/**
+ * Styles for overriding/appending to Bootstrap's defaults
+ */
+
+.navbar-default {
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+}
+
+.navbar-brand {
+    font-family: $headings-font-family;
+}
+
+h1, .h1 {
+    margin-bottom: $line-height-computed * 2;
+}
+
+.label-default[href]:hover, .label-default[href]:focus {
+    background-color: $label-default-hover-color;
+}
+
+a {
+    transition: color .2s ease;
+}
+
+.label {
+    transition: background .2s ease;
+}

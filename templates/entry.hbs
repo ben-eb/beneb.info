@@ -1,0 +1,16 @@
+{{> header }}
+<div class="container">
+    <div class="row">
+        <h1 class="col-lg-12">
+            {{#if link}}
+                {{ link_to link title }} <small>{{ link_to_permalink path title }}</small>
+            {{else}}
+                {{ link_to path title }}
+            {{/if}}
+        </h1>
+    </div>
+<!-- Unindented so that the pre tag is not indented further than it should be -->
+{{> entryBody }}
+<!-- ends -->
+</div>
+{{> footer }}
