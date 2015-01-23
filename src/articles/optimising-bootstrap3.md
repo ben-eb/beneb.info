@@ -114,19 +114,18 @@ Lets say that you aren't going to use the JS components in your application. Wel
 A more scalable version of the above is to use UnCSS, a tool that find unused CSS rules by analysing them against the HTML of your website. I wrote a [gulp plugin for UnCSS][gulpUnCSS] which allows us to do the same thing in our build:
 
 ```sh
-$ npm install glob gulp-uncss --save-dev
+$ npm install gulp-uncss --save-dev
 ```
 
 Depending on the size of your site, it probably won't be feasible to run this tool whilst you are developing. Instead, have a separate UnCSS task that you can run before deploying to production, like so:
 
 ```js
-var glob  = require('glob').sync,
-    uncss = require('gulp-uncss');
+var uncss = require('gulp-uncss');
 
 gulp.task('uncss', function () {
     return gulp.src('./build/css/main.css')
         .pipe(uncss({
-            html: glob('./build/**/*.html')
+            html: ['./build/**/*.html']
         }))
         .pipe(gulp.dest('./build/css'));
 });
@@ -318,7 +317,7 @@ gulp.task('styles', function () {
 gulp.task('uncss', function () {
     return gulp.src('./build/css/main.css')
         .pipe(uncss({
-            html: glob('./build/**/*.html')
+            html: ['./build/**/*.html']
         }))
         .pipe(cssOptim())
         .pipe(gulp.dest('./build/css'));

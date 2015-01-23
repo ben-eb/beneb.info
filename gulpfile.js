@@ -154,7 +154,7 @@ gulp.task('watch', function () {
 gulp.task('uncss', function () {
     return gulp.src('./build/css/main.css')
         .pipe(uncss({
-            html: glob('./build/**/*.html')
+            html: ['./build/**/*.html']
         }))
         .pipe(cssOptim())
         .pipe(gulp.dest('./build/css'));
