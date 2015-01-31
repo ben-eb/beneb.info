@@ -296,7 +296,8 @@ var autoprefixer = require('gulp-autoprefixer'),
     more         = require('gulp-more-css'),
     gulp         = require('gulp'),
     sass         = require('gulp-ruby-sass'),
-    shrink       = require('gulp-cssshrink');
+    shrink       = require('gulp-cssshrink'),
+    uncss        = require('gulp-uncss');
 
 var cssOptim = lazypipe()
     .pipe(cssc)
