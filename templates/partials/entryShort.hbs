@@ -1,10 +1,14 @@
-<li>
-    <h3>
-    {{#if link}}
-        {{ link_to link title }} <small>{{ link_to_permalink path title }}</small>
-    {{else}}
-        {{ link_to path title }}
-    {{/if}}
-    <small class="pull-right">{{ format_date_only date }}</small>
-    </h3>
-</li>
+<div class="row">
+    <div class="col-lg-9">
+        <h3>
+        {{#if link}}
+            {{ link_to link title }} <small>{{ link_to_permalink path title }}</small>
+        {{else}}
+            {{ link_to path title }}
+        {{/if}}
+        </h3>
+    </div>
+    <div class="col-lg-3">
+        <small>{{ format_date_only date }}</small>
+    </div>
+</div>

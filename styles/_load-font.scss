@@ -1,11 +1,35 @@
 $font_directory: '../fonts/' !default;
 
-@mixin load_font($name, $location, $weight: normal, $style: normal) {
+@mixin load_font($name, $location, $weight: normal, $style: normal, $range: null) {
     @font-face {
         font-family: $name;
         src: url('#{$font_directory}#{$location}.woff2') format('woff2'),
              url('#{$font_directory}#{$location}.woff') format('woff');
         font-weight: $weight;
         font-style: $style;
+        @if $range != null {
+          unicode-range: $range;
+        }
+    }
+}
+
+@function wrap-list($list, $start: '', $end: '') {
+  $result: null;
+  
+  @for $i from 1 through length($list) {
+    $item: nth($list, $i);
+    $result: $result#{$start}#{$item}#{$end}
+  }
+  
+  @return str-slice($result, 2, -2);
+}
+
+@mixin load_local_font($name, $fonts, $range) {
+    @font-face {
+        font-family: $name;
+        src: wrap-list($fonts, ' local(', '),');
+        @if $range {
+          unicode-range: $range;
+        }
     }
 }

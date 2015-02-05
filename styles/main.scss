@@ -64,6 +64,13 @@
 @include load_font(Bitter, 'bitter-bold-webfont', 700);
 @include load_font(Bitter, 'bitter-bolditalic-webfont', 700, italic);
 
+@include load_local_font(Ampersand, ('Baskerville-italic', 'Palatino', 'Book Antiqua'), U+26);
+@include load_local_font(Ampersand Headings, ('Baskerville-italic', 'Palatino', 'Book Antiqua'), U+26);
+
+@include load_font(Ampersand, 'oxygen-webfont', 400, normal, U+270C);
+@include load_font(Ampersand Headings, 'bitter-regular-webfont', 400, normal, U+270C);
+
+
 /**
  * Code highlighting
  */

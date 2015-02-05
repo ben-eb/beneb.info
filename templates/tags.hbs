@@ -2,11 +2,9 @@
 
 <div class="container">
     <h1>#{{tag}}</h1>
-    <ul class="list-unstyled">
-        {{#each posts}}
-            {{> entryShort }}
-        {{/each}}
-    </ul>
+    {{#each posts}}
+        {{> entryShort }}
+    {{/each}}
 </div>
 
 {{> footer }}
