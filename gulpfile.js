@@ -128,10 +128,10 @@ Handlebars.registerHelper('copyright_year', function () {
  */
 
 var cssOptim = lazypipe()
-    .pipe(csso)
+    //.pipe(csso)
     .pipe(cssc)
-    .pipe(shrink)
-    .pipe(more);
+    //.pipe(shrink)
+    //.pipe(more);
 
 /**
  * Define our gulp tasks.
