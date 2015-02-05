@@ -22,6 +22,8 @@ That way, if the design is updated and the custom ampersands do not fit into the
 Essentially the gist of the article is that you can specify a local font to use as an ampersand, then override it in Firefox. I am using this technique on this blog, but instead of using Arial as a fallback, I wanted to use the fonts that I already had in place. The code, then, is slightly more verbose:
 
 ```css
+/* Load the web fonts */
+
 @font-face {
     font-family: Oxygen;
     font-style: normal;
@@ -38,6 +40,8 @@ Essentially the gist of the article is that you can specify a local font to use 
          url(../fonts/bitter-regular-webfont.woff) format("woff");
 }
 
+/* Load the ampersand override */
+
 @font-face {
     font-family: Ampersand;
     src: local(Baskerville-italic), local(Palatino), local(Book Antiqua);
@@ -49,6 +53,8 @@ Essentially the gist of the article is that you can specify a local font to use 
     src: local(Baskerville-italic), local(Palatino), local(Book Antiqua);
     unicode-range: U+26;
 }
+
+/* Load the ampersand fallback */
 
 @font-face {
     font-family: Ampersand;
@@ -66,6 +72,16 @@ Essentially the gist of the article is that you can specify a local font to use 
     src: url(../fonts/bitter-regular-webfont.woff2) format("woff2"),
          url(../fonts/bitter-regular-webfont.woff) format("woff");
     unicode-range:U+270C;
+}
+
+/* Apply the fonts to body copy and headings */
+
+body {
+    font-family: Ampersand, Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif;
+}
+
+h1 {
+    font-family: Ampersand Headings, Bitter, Georgia, Times New Roman, Times, serif;
 }
 ```
 
