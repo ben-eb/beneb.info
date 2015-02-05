@@ -1,6 +1,8 @@
 <html><head><title>Better ampersands &amp; how to achieve them with unicode range | Ben Briggs - Front end developer</title><link rel="stylesheet" href="/css/main.css"></head><body><nav class="navbar navbar-default" role="navigation"><div class="container"><div class="navbar-header"><a class="navbar-brand" href="/">Ben Briggs</a></div></div></nav><div class="container"><div class="row"><h1 class="col-lg-12"><a href="/2015/02/better-ampersands-how-to-achieve-them-with-unicode-range" title="Permanent link to 'Better ampersands & how to achieve them with unicode range'">Better ampersands & how to achieve them with unicode&nbsp;range</a></h1></div><div class="row"><article class="col-lg-9"><p>Recently, I discovered <a href="http://24ways.org/2011/creating-custom-font-stacks-with-unicode-range/">this article on unicode-range</a>—it was definitely worth a read. While Firefox <em>still doesn't support this technique</em> (it's coming in version 36), one of the things that I found really interesting about it was that it is possible to do this sort of thing <em>in text</em>. It feels really wrong doing&nbsp;this:</p><pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>Some title <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"amp"</span>&gt;</span>&amp;amp;<span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> some other stuff<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
 </code></pre><p>On a blog such as this one which uses Markdown for publishing, it's much cleaner to write&nbsp;this:</p><pre><code class="lang-markdown"><span class="hljs-header"># Some title &amp; some other stuff</span>
-</code></pre><p>That way, if the design is updated and the custom ampersands do not fit into the new look, the CSS can be removed &amp; nothing else has to&nbsp;change!</p><p>Essentially the gist of the article is that you can specify a local font to use as an ampersand, then override it in Firefox. I am using this technique on this blog, but instead of using Arial as a fallback, I wanted to use the fonts that I already had in place. The code, then, is slightly more&nbsp;verbose:</p><pre><code class="lang-css"><span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+</code></pre><p>That way, if the design is updated and the custom ampersands do not fit into the new look, the CSS can be removed &amp; nothing else has to&nbsp;change!</p><p>Essentially the gist of the article is that you can specify a local font to use as an ampersand, then override it in Firefox. I am using this technique on this blog, but instead of using Arial as a fallback, I wanted to use the fonts that I already had in place. The code, then, is slightly more&nbsp;verbose:</p><pre><code class="lang-css"><span class="hljs-comment">/* Load the web fonts */</span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Oxygen</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">font-style</span>:<span class="hljs-value"> normal</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
@@ -16,6 +18,8 @@
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
 <span class="hljs-rule">}</span></span>
 
+<span class="hljs-comment">/* Load the ampersand override */</span>
+
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
@@ -27,6 +31,8 @@
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
 <span class="hljs-rule">}</span></span>
+
+<span class="hljs-comment">/* Load the ampersand fallback */</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
@@ -45,4 +51,14 @@
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value">U+<span class="hljs-number">270</span>C</span></span>;
 <span class="hljs-rule">}</span></span>
-</code></pre><p>This way means that you can have a nice custom ampersand in supported browsers, &amp; in Firefox the ampersand will gracefully degrade back to the webfont it was already&nbsp;using.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Published</h4><p class="meta-description--contents">Thursday, February 5th 2015, at&nbsp;16:40</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">1 min (289&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/typography" class="label label-default" title="Browse entries tagged with&nbsp;'typography'">typography</a></p></div></div></aside></div></div><div class="container"><footer><small>Designed &amp; built by Ben Briggs &copy; 2015. Find my code on <a href="https://github.com/ben-eb">GitHub</a> and more opinions on <a href="https://twitter.com/ben_eb">Twitter</a>.</small></footer></div></body></html>
+
+<span class="hljs-comment">/* Apply the fonts to body copy and headings */</span>
+
+<span class="hljs-tag">body</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand, Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-tag">h1</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings, Bitter, Georgia, Times New Roman, Times, serif</span></span>;
+<span class="hljs-rule">}</span></span>
+</code></pre><p>This way means that you can have a nice custom ampersand in supported browsers, &amp; in Firefox the ampersand will gracefully degrade back to the webfont it was already&nbsp;using.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Published</h4><p class="meta-description--contents">Thursday, February 5th 2015, at&nbsp;17:21</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">2 min (341&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/typography" class="label label-default" title="Browse entries tagged with&nbsp;'typography'">typography</a></p></div></div></aside></div></div><div class="container"><footer><small>Designed &amp; built by Ben Briggs &copy; 2015. Find my code on <a href="https://github.com/ben-eb">GitHub</a> and more opinions on <a href="https://twitter.com/ben_eb">Twitter</a>.</small></footer></div></body></html>
