@@ -38,5 +38,8 @@
   "scripts": {
     "compile": "gulp compile --production",
     "develop": "gulp watch --silent &"
+  },
+  "dependencies": {
+    "metalsmith-excerpts": "^1.0.0"
   }
 }

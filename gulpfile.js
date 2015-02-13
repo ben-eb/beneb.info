@@ -13,6 +13,7 @@ var autoprefixer = require('gulp-autoprefixer'),
     csso         = require('gulp-csso'),
     drafts       = require('metalsmith-drafts'),
     ecstatic     = require('ecstatic'),
+    excerpts     = require('metalsmith-excerpts'),
     fs           = require('fs'),
     glob         = require('glob').sync,
     gulp         = require('gulp'),
@@ -178,6 +179,7 @@ gulp.task('metalsmith', function (cb) {
         }
     }))
     .use(markdown())
+    .use(excerpts())
     .use(highlight({
         scoped: 'pre code'
     }))

@@ -1,0 +1,27 @@
+<div class="row">
+    <article class="col-lg-9">
+        {{{ excerpt }}}
+        <p>
+            {{#if link}}
+                {{ link_to_permalink path 'Continue reading...' }}
+            {{else}}
+                {{ link_to path 'Continue reading...' }}
+            {{/if}}
+        </p>
+    </article>
+    <aside class="col-lg-3">
+        <div class="row">
+            {{#ifDaySame stats.mtime date }}
+                <div class="col-sm-3 col-lg-12">
+                    <h4 class="meta-description">Published</h4>
+                    <p  class="meta-description--contents">{{ format_date stats.mtime }}</p>
+                </div>
+            {{else}}
+                <div class="col-sm-3 col-lg-12">
+                    <h4 class="meta-description">Last updated</h4>
+                    <p  class="meta-description--contents">{{ format_date stats.mtime }}</p>
+                </div>
+            {{/ifDaySame}}
+        </div>
+    </aside>
+</div>
