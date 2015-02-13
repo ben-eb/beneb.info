@@ -7,6 +7,7 @@
 var autoprefixer = require('gulp-autoprefixer'),
     branch       = require('metalsmith-branch'),
     chalk        = require('chalk'),
+    cheerio      = require('cheerio'),
     collections  = require('metalsmith-collections'),
     combinemq    = require('gulp-combine-mq'),
     cssc         = require('gulp-css-condense'),
@@ -39,6 +40,20 @@ var autoprefixer = require('gulp-autoprefixer'),
     wordcount    = require('metalsmith-word-count');
 
 /* ---------------------------------------------------------------- */
+
+var renderer = new markdown.marked.Renderer();
+
+renderer.blockquote = function (text) {
+    var $ = cheerio.load('' + text);
+    $('p').each(function () {
+        if ($(this).text().indexOf('--') === 0) {
+            var html = $(this).html().replace('--', '');
+            var footer = $('<footer>' + html + '</footer>');
+            $(this).replaceWith(footer);
+        }
+    });
+    return '<blockquote>' + $.html() + '</blockquote>';
+};
 
 /**
  * Get common asset paths
@@ -178,7 +193,7 @@ gulp.task('metalsmith', function (cb) {
             pattern: 'topics/**/*'
         }
     }))
-    .use(markdown())
+    .use(markdown({ renderer: renderer }))
     .use(excerpts())
     .use(highlight({
         scoped: 'pre code'
