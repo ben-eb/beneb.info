@@ -40,6 +40,13 @@ $code-bg: hsla(186, 20%, 90%, 1);
 $code-color: darken($pre-color, 50%);
 
 /**
+ * Blockquotes
+ */
+
+$blockquote-small-color: $link-color;
+$blockquote-font-size: ($font-size-base * 1.1);
+
+/**
  * Navbar component
  */
 

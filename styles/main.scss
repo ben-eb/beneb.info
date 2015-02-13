@@ -107,11 +107,15 @@ p > a:not(.label) {
     text-decoration: underline;
 }
 
+blockquote a {
+    font-weight: bold;
+}
+
 /**
  * Footer styling
  */
 
-footer {
+.container > footer {
     border-top: 1px solid $page-header-border-color;
     margin: 100px 0;
     padding-top: $line-height-computed;
