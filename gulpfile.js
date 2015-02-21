@@ -41,7 +41,7 @@ var autoprefixer = require('gulp-autoprefixer'),
 
 /* ---------------------------------------------------------------- */
 
-var renderer = new markdown.marked.Renderer();
+var renderer = new (require('marked')).Renderer();
 
 renderer.blockquote = function (text) {
     var $ = cheerio.load('' + text);
