@@ -48,8 +48,7 @@ renderer.blockquote = function (text) {
     $('p').each(function () {
         if ($(this).text().indexOf('--') === 0) {
             var html = $(this).html().replace('--', '');
-            var footer = $('<footer>' + html + '</footer>');
-            $(this).replaceWith(footer);
+            $(this).replaceWith($('<footer>' + html + '</footer>'));
         }
     });
     return '<blockquote>' + $.html() + '</blockquote>';
