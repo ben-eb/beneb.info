@@ -177,6 +177,9 @@ gulp.task('uncss', function () {
 
 gulp.task('metalsmith', function (cb) {
     Metalsmith(__dirname)
+    .metadata({
+        isDev: !settings.production
+    })
     .clean(settings.production)
     .use(drafts())
     .use(collections({
