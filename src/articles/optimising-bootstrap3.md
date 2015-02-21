@@ -5,29 +5,60 @@ tags: gulpjs,css,optimisation,minify
 template: entry.hbs
 ---
 
-One of the great things about [Bootstrap](http://getbootstrap.com) is that it offers a strong foundation on which to build a website or web application. The documentation is extensive, it offers many components for common use cases, and it lends itself to rapid development. However, when deploying to production, it can seem less appealing. CSS files produced by Bootstrap tend to be over 100KB, and that's *before* you start adding your own custom rules. Especially when developing a small website, it is unlikely that you'll need all of the elements that it has to offer.
+One of the great things about [Bootstrap](http://getbootstrap.com) is that it
+offers a strong foundation on which to build a website or web application. The
+documentation is extensive, it offers many components for common use cases, and
+it lends itself to rapid development. However, when deploying to production, it
+can seem less appealing. CSS files produced by Bootstrap tend to be over 100KB,
+and that's *before* you start adding your own custom rules. Especially when
+developing a small website, it is unlikely that you'll need all of the elements
+that it has to offer.
 
-In this post we'll look at what measures we can take to reduce Bootstrap 3 down to only its necessary elements. Your mileage may vary, depending on how much of the framework you use; and to get the most out of Bootstrap you should be using a CSS preprocessor. Bootstrap is written in Less but there is also a [Sass port][sassPort], which I will be referencing in this article. Also note that some of these techniques are equally applicable to other CSS frameworks.
+In this post we'll look at what measures we can take to reduce Bootstrap 3 down
+to only its necessary elements. Your mileage may vary, depending on how much of
+the framework you use; and to get the most out of Bootstrap you should be using
+a CSS preprocessor. Bootstrap is written in Less but there is also a
+[Sass port][sassPort], which I will be referencing in this article. Also note
+that some of these techniques are equally applicable to other CSS frameworks.
 
 ## Put down pre-packaged builds. Hello Sass.
 
-One of the first things we need to start with is customising our own version of Bootstrap 3. To get the most out of our stylesheets, we shouldn't be using pre-packaged builds that third parties provide to us as a convenience; they encourage us to put their CDN links first and then override the styling with our own rules. Unfortunately this means that we miss out on one of the best features of Bootstrap; its *customisability*.
+One of the first things we need to start with is customising our own version of
+Bootstrap 3. To get the most out of our stylesheets, we shouldn't be using
+pre-packaged builds that third parties provide to us as a convenience; they
+encourage us to put their CDN links first and then override the styling with our
+own rules. Unfortunately this means that we miss out on one of the best features
+of Bootstrap; its *customisability*.
 
-However, this does not mean that we should all jump on over to [the customise page for Bootstrap](http://getbootstrap.com/customize/), with its myriad options. The likelihood is that all of the hex colours/font sizes that you input there will be consistent with other, custom components that you write yourself. Therefore, you should be defining them in your Sass files instead, making them reusable and easily modifiable.
+However, this does not mean that we should all jump on over to
+[the customise page for Bootstrap](http://getbootstrap.com/customize/),
+with its myriad options. The likelihood is that all of the hex colours/font
+sizes that you input there will be consistent with other, custom components that
+you write yourself. Therefore, you should be defining them in your Sass files
+instead, making them reusable and easily modifiable.
 
-The first step is to [install the Sass version of Bootstrap][sassPort]. With [Bower](http://bower.io), we can simply do:
+The first step is to [install the Sass version of Bootstrap][sassPort]. With
+[Bower](http://bower.io), we can simply do:
 
 ```sh
 $ bower install bootstrap-sass-official
 ```
 
-Next, we need to load it into our Sass files. But hold on; we need to start writing a *build process* which will end up handling all of our compilation and optimisation tasks, and ensure that we have a customised build of Bootstrap for our production site. For tasks such as these, [gulp](http://gulpjs.com) suits the job perfectly as a sequence of transformations can be applied to our CSS in memory. Once you have installed gulp globally, then install the other dependencies from npm:
+Next, we need to load it into our Sass files. But hold on; we need to start
+writing a *build process* which will end up handling all of our compilation and
+optimisation tasks, and ensure that we have a customised build of Bootstrap for
+our production site. For tasks such as these, [gulp](http://gulpjs.com) suits
+the job perfectly as a sequence of transformations can be applied to our CSS in
+memory. Once you have installed gulp globally, then install the other
+dependencies from npm:
 
 ```sh
 $ npm install gulp gulp-ruby-sass@1.0.0-alpha chalk --save-dev
 ```
 
-Our first iteration of our Sass task should just take the source files from the `styles` directory, compile them into CSS and then write them to a destination. In addition, if there were any errors, log them to the console:
+Our first iteration of our Sass task should just take the source files from the
+`styles` directory, compile them into CSS and then write them to a destination.
+In addition, if there were any errors, log them to the console:
 
 ```js
 var chalk = require('chalk'),
@@ -42,17 +73,21 @@ gulp.task('styles', function () {
 });
 ```
 
-We define a `loadPath` here so that we can import Bootstrap into our stylesheets. So, in the `./styles` directory, create a new file called `main.scss` and write:
+We define a `loadPath` here so that we can import Bootstrap into our stylesheets.
+So, in the `./styles` directory, create a new file called `main.scss` and write:
 
 ```scss
 @import 'bootstrap';
 ```
 
-Now, when we run `gulp styles`, we will have the full Bootstrap 3 source code in the `./build/css` directory. We are ready to start optimising.
+Now, when we run `gulp styles`, we will have the full Bootstrap 3 source code in
+the `./build/css` directory. We are ready to start optimising.
 
 ## Method 1: Include only necessary components
 
-The simplest way to trim down the framework is just simply to customise which `@import` statements that you carry over into your main CSS file. You can do this by changing the contents of `main.scss` to something like this:
+The simplest way to trim down the framework is just simply to customise which
+`@import` statements that you carry over into your main CSS file. You can do
+this by changing the contents of `main.scss` to something like this:
 
 ```scss
 // Core variables and mixins
@@ -107,17 +142,26 @@ The simplest way to trim down the framework is just simply to customise which `@
 @import "bootstrap/responsive-utilities";
 ```
 
-Lets say that you aren't going to use the JS components in your application. Well, just simply delete the relevant `@import` statements, and already your build is looking smaller. But, six months later on, you may want to add some of these back in to your build, as your requirements may change, so this approach may not scale well.
+Lets say that you aren't going to use the JS components in your application.
+Well, just simply delete the relevant `@import` statements, and already your
+build is looking smaller. But, six months later on, you may want to add some of
+these back in to your build, as your requirements may change, so this approach
+may not scale well.
 
 ## Method 2: Use UnCSS to determine which classes are being used
 
-A more scalable version of the above is to use UnCSS, a tool that find unused CSS rules by analysing them against the HTML of your website. I wrote a [gulp plugin for UnCSS][gulpUnCSS] which allows us to do the same thing in our build:
+A more scalable version of the above is to use UnCSS, a tool that find unused
+CSS rules by analysing them against the HTML of your website. I wrote a
+[gulp plugin for UnCSS][gulpUnCSS] which allows us to do the same thing in our
+build:
 
 ```sh
 $ npm install gulp-uncss --save-dev
 ```
 
-Depending on the size of your site, it probably won't be feasible to run this tool whilst you are developing. Instead, have a separate UnCSS task that you can run before deploying to production, like so:
+Depending on the size of your site, it probably won't be feasible to run this
+tool whilst you are developing. Instead, have a separate UnCSS task that you can
+run before deploying to production, like so:
 
 ```js
 var uncss = require('gulp-uncss');
@@ -131,11 +175,18 @@ gulp.task('uncss', function () {
 });
 ```
 
-Note that UnCSS does not detect classes that are added by user interaction, so if you are to use any JavaScript components from the framework then [you must pass an `ignore` list][gulpUnCSS] to UnCSS. Even so, especially on small sites, UnCSS makes a huge difference to the size of the output file.
+Note that UnCSS does not detect classes that are added by user interaction, so
+if you are to use any JavaScript components from the framework then
+[you must pass an `ignore` list][gulpUnCSS] to UnCSS. Even so, especially on
+small sites, UnCSS makes a huge difference to the size of the output file.
 
 ## Method 3: Use combine-mq to eliminate duplication of media queries
 
-Because of Bootstrap's expansive size, its CSS rules must be grouped together into logical components; this is also true of the media query selectors that it uses. There are many media query breakpoints that are repeated over and over, adding weight to the CSS file. To optimise this, we can use [gulp-combine-mq][gulpCombineMQ], which will remove duplicates.
+Because of Bootstrap's expansive size, its CSS rules must be grouped together
+into logical components; this is also true of the media query selectors that it
+uses. There are many media query breakpoints that are repeated over and over,
+adding weight to the CSS file. To optimise this, we can use
+[gulp-combine-mq][gulpCombineMQ], which will remove duplicates.
 
 ```sh
 $ npm install gulp-combine-mq --save-dev
@@ -157,7 +208,15 @@ gulp.task('styles', function () {
 
 ## Method 4: Use autoprefixer to include only necessary vendor prefixes
 
-Autoprefixer is a tool that adds vendor prefixes to unprefixed CSS properties, and is based on the excellent [Can I use...][canIuse] database. This means that we only have to include prefixes for browsers that still need them, and redundant properties are dropped from the resulting stylesheet. So, in a few years time, when Browser X supports a feature unprefixed and usage of the older versions declines to a less than relevant installed percentage, Autoprefixer will know to not supply the prefix for that browser. It also means that when authoring your SCSS, you don't need to write the vendor prefixes yourself. It's an easy win.
+Autoprefixer is a tool that adds vendor prefixes to unprefixed CSS properties,
+and is based on the excellent [Can I use...][canIuse] database. This means that
+we only have to include prefixes for browsers that still need them, and
+redundant properties are dropped from the resulting stylesheet. So, in a few
+years time, when Browser X supports a feature unprefixed and usage of the older
+versions declines to a less than relevant installed percentage, Autoprefixer
+will know to not supply the prefix for that browser. It also means that when
+authoring your SCSS, you don't need to write the vendor prefixes yourself. It's
+an easy win.
 
 ```sh
 $ npm install gulp-autoprefixer --save-dev
@@ -180,7 +239,12 @@ gulp.task('styles', function () {
 
 ## Method 5: Use variables for customising, rather than writing more selectors
 
-Let us return to customisability. Writing more selectors for Bootstrap to define things like a different button colour, or a different form control style can lead to bloat. Instead, before we do any of that, we should customise the base framework and only include our own custom components when necessary. At this point, I like to extract the variables part of `main.scss` out into its own file - so that `main.scss` now looks like this:
+Let us return to customisability. Writing more selectors for Bootstrap to define
+things like a different button colour, or a different form control style can
+lead to bloat. Instead, before we do any of that, we should customise the base
+framework and only include our own custom components when necessary. At this
+point, I like to extract the variables part of `main.scss` out into its own file -
+so that `main.scss` now looks like this:
 
 ```scss
 @import "variables";
@@ -204,11 +268,17 @@ $text-color: #fff;
 @import "bootstrap/mixins";
 ```
 
-This code customises Bootstrap with a black background and white text, without us having to write another selector. For simple customisations like this, have a look in your copy of [Bootstrap Sass][sassPort] for the `_variables.scss` file. In here you will find all of the variables so that you can change the appearance of Bootstrap to your liking.
+This code customises Bootstrap with a black background and white text, without
+us having to write another selector. For simple customisations like this, have a
+look in your copy of [Bootstrap Sass][sassPort] for the `_variables.scss` file.
+In here you will find all of the variables so that you can change the appearance
+of Bootstrap to your liking.
 
 ## Method 6: Get a *good* minifier
 
-There exist a plethora of CSS minification tools for JavaScript. In my opinion, the best ones offer selector and declaration consolidation; such that CSS like this:
+There exist a plethora of CSS minification tools for JavaScript. In my opinion,
+the best ones offer selector and declaration consolidation; such that CSS like
+this:
 
 ```css
 body {
@@ -226,9 +296,17 @@ Will be minified to this:
 body{color:red;background:#fff}
 ```
 
-This is useful when you are using a framework; what happens if you need to add a property to an element/class that already exists in Bootstrap, but can't edit the Sass file for obvious future compatibility reasons? Well, you can let a minifier do the work for you. [gulp-css-condense][gulpCSSC] uses these techniques to minimise your CSS structure. Other good minifiers include [gulp-csso][gulpCSSO], [gulp-more-css][gulpMoreCSS] and [gulp-cssshrink][gulpCSSShrink].
+This is useful when you are using a framework; what happens if you need to add a
+property to an element/class that already exists in Bootstrap, but can't edit
+the Sass file for obvious future compatibility reasons? Well, you can let a
+minifier do the work for you. [gulp-css-condense][gulpCSSC] uses these
+techniques to minimise your CSS structure. Other good minifiers include
+[gulp-csso][gulpCSSO], [gulp-more-css][gulpMoreCSS] and
+[gulp-cssshrink][gulpCSSShrink].
 
-I've found that because each of these compressors offer different functionality, it's possible to extract the most compression out of your CSS by using multiple compressors. We can do that easily in gulp:
+I've found that because each of these compressors offer different functionality,
+it's possible to extract the most compression out of your CSS by using multiple
+compressors. We can do that easily in gulp:
 
 ```sh
 $ npm install gulp-css-condense gulp-csso gulp-more-css gulp-cssshrink --save-dev
@@ -254,17 +332,24 @@ gulp.task('styles', function () {
 });
 ```
 
-Now, when we run the `styles` task, we will get a autoprefixed, media query combined, aggressively optimised CSS file. Great!
+Now, when we run the `styles` task, we will get a autoprefixed, media query
+combined, aggressively optimised CSS file. Great!
 
 ## Extracting compression methods with lazypipe
 
-We're not quite done here. You will notice that our UnCSS task does not run any of the minification tasks - because it isn't a minifier itself the output looks closer to the Sass as we started writing it, although the overall size is smaller. But wait, before you start copying and pasting the `pipe()` chain from the `styles` task, you can use [lazypipe][lazypipe]!
+We're not quite done here. You will notice that our UnCSS task does not run any
+of the minification tasks - because it isn't a minifier itself the output looks
+closer to the Sass as we started writing it, although the overall size is
+smaller. But wait, before you start copying and pasting the `pipe()` chain from
+the `styles` task, you can use [lazypipe][lazypipe]!
 
 ```sh
 $ npm install lazypipe --save-dev
 ```
 
-Using lazypipe allows us to create an immutable stream 'factory'. Basically it means we are creating a pipeline that we can hook into in our various gulp tasks. We can use it like so:
+Using lazypipe allows us to create an immutable stream 'factory'. Basically it
+means we are creating a pipeline that we can hook into in our various gulp
+tasks. We can use it like so:
 
 ```js
 var cssOptim = lazypipe()
@@ -284,7 +369,9 @@ gulp.task('styles', function () {
 });
 ```
 
-Note that we don't call the `cssOptim` function until we need it in our `styles` task. We can now reuse that pipeline for any other tasks that might want to process CSS, such as UnCSS. So our final gulpfile should look like this:
+Note that we don't call the `cssOptim` function until we need it in our `styles`
+task. We can now reuse that pipeline for any other tasks that might want to
+process CSS, such as UnCSS. So our final gulpfile should look like this:
 
 ```js
 var autoprefixer = require('gulp-autoprefixer'),
@@ -327,9 +414,18 @@ gulp.task('uncss', function () {
 
 ## Putting it into practice
 
-Why blog about this kind of optimisation if its not something that you're going to use? So, behold! This blog is using all of the techniques covered in the article; pay attention to the CSS source code and you'll notice that there are many familiar styles in there to describe columns, and header navigation; but many of the helper classes and columns/components that are unused have been stripped away, leaving only what the blog needs.
+Why blog about this kind of optimisation if its not something that you're going
+to use? So, behold! This blog is using all of the techniques covered in the
+article; pay attention to the CSS source code and you'll notice that there are
+many familiar styles in there to describe columns, and header navigation; but
+many of the helper classes and columns/components that are unused have been
+stripped away, leaving only what the blog needs.
 
-In closing, remember that although this article is focused on Bootstrap, these techniques can (and should!) be applied to CSS whereever it may be used. The amount of tooling that we can use to perfect our stylesheets should be taken advantage of, as every optimisation means a faster, better website experience for you and your users.
+In closing, remember that although this article is focused on Bootstrap, these
+techniques can (and should!) be applied to CSS whereever it may be used. The
+amount of tooling that we can use to perfect our stylesheets should be taken
+advantage of, as every optimisation means a faster, better website experience
+for you and your users.
 
 [canIuse]: http://caniuse.com/
 [sassPort]: https://github.com/twbs/bootstrap-sass

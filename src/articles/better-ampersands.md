@@ -5,21 +5,30 @@ tags: css,typography
 template: entry.hbs
 ---
 
-Recently, I discovered [this article on unicode-range](http://24ways.org/2011/creating-custom-font-stacks-with-unicode-range/)&mdash;it was definitely worth a read. While Firefox *still doesn't support this technique* (it's coming in version 36), one of the things that I found really interesting about it was that it is possible to do this sort of thing *in text*. It feels really wrong doing this:
+Recently, I discovered [this article on unicode-range][1]&mdash;it was
+definitely worth a read. While Firefox *still doesn't support this technique*
+(it's coming in version 36), one of the things that I found really interesting
+about it was that it is possible to do this sort of thing *in text*. It feels
+really wrong doing this:
 
 ```html
 <h1>Some title <span class="amp">&amp;</span> some other stuff</h1>
 ```
 
-On a blog such as this one which uses Markdown for publishing, it's much cleaner to write this:
+On a blog such as this one which uses Markdown for publishing, it's much cleaner
+to write this:
 
 ```markdown
 # Some title & some other stuff
 ```
 
-That way, if the design is updated and the custom ampersands do not fit into the new look, the CSS can be removed & nothing else has to change!
+That way, if the design is updated and the custom ampersands do not fit into the
+new look, the CSS can be removed & nothing else has to change!
 
-Essentially the gist of the article is that you can specify a local font to use as an ampersand, then override it in Firefox. I am using this technique on this blog, but instead of using Arial as a fallback, I wanted to use the fonts that I already had in place. The code, then, is slightly more verbose:
+Essentially the gist of the article is that you can specify a local font to use
+as an ampersand, then override it in Firefox. I am using this technique on this
+blog, but instead of using Arial as a fallback, I wanted to use the fonts that
+I already had in place. The code, then, is slightly more verbose:
 
 ```css
 /* Load the web fonts */
@@ -85,4 +94,8 @@ h1 {
 }
 ```
 
-This way means that you can have a nice custom ampersand in supported browsers, & in Firefox the ampersand will gracefully degrade back to the webfont it was already using.
+This way means that you can have a nice custom ampersand in supported browsers,
+& in Firefox the ampersand will gracefully degrade back to the webfont it was
+already using.
+
+[1]: http://24ways.org/2011/creating-custom-font-stacks-with-unicode-range/
