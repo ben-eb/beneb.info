@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Ben Briggs]]></title><description><![CDATA[Ben Briggs]]></description><link>http://beneb.info</link><generator>metalsmith-feed</generator><lastBuildDate>Sun, 22 Feb 2015 20:31:16 GMT</lastBuildDate><atom:link href="http://beneb.info/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[Ben Briggs]]></author><item><title><![CDATA[More powerful Markdown with custom renderers]]></title><description><![CDATA[<p>Markdown is great if you just want to put your thoughts down somewhere; its
+plain text, no-nonsense approach means that it is much easier to focus on
+actually <em>writing</em> an article, rather than messing around with different HTML
+elements &amp; classes. However, what if we're using a framework such as Bootstrap,
+which has great blockquote styling, <em>but only if we structure our HTML a certain
+way</em>?</p>
+<p>To get the nice dash before our citation, Bootstrap requires that we place it in
+a <code>&lt;footer&gt;</code> tag, which is fine, but Markdown doesn't offer this capability for
+us. It does allow us to write HTML inline instead, but that isn't very portable;
+what if we migrate to another framework that doesn't use this HTML? Well, we end
+up having this HTML forever in our Markdown files.</p>
+<p>That doesn't sound very appealing. So, what we'll do instead is use <a href="https://github.com/cheeriojs/cheerio">cheerio</a>
+and write a custom renderer for <a href="https://github.com/chjj/marked">marked</a> to automate the process for us; all
+we have to do from now on is write blockquotes in Markdown format, and it will
+be converted into our custom HTML automatically.</p>
+<blockquote><p>I couldn't tell you in any detail how my computer works. I use it with a layer
+of automation.</p>
+<footer><a href="http://www.wired.co.uk/news/archive/2012-06/28/conrad-wolfram-computation">Conrad Wolfram</a></footer>
+</blockquote><p>In Markdown, this quote would look like the following:</p>
+<pre><code class="lang-markdown"><span class="hljs-blockquote">&gt; I couldn't tell you in any detail how my computer works. I use it with a layer</span>
+<span class="hljs-blockquote">&gt; of automation.</span>
+<span class="hljs-blockquote">&gt;
+&gt; --[Conrad Wolfram][1]</span>
+</code></pre>
+<p>We want to generate the following output:</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">blockquote</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">p</span>&gt;</span>I couldn't tell you in any detail how my computer works. I use it with a
+    layer of automation.<span class="hljs-tag">&lt;/<span class="hljs-title">p</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-title">footer</span>&gt;</span>
+        <span class="hljs-tag">&lt;<span class="hljs-title">a</span> <span class="hljs-attribute">href</span>=<span class="hljs-value">"http://www.wired.co.uk/news/archive/2012-06/28/conrad-wolfram-computation"</span>&gt;</span>Conrad Wolfram<span class="hljs-tag">&lt;/<span class="hljs-title">a</span>&gt;</span>
+    <span class="hljs-tag">&lt;/<span class="hljs-title">footer</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">blockquote</span>&gt;</span>
+</code></pre>
+<p>In my case, I'm using <a href="http://www.metalsmith.io/">metalsmith</a> to transform the Markdown into HTML, but
+the renderer logic will be the same as for any other set up. Here's the code
+for that:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> cheerio  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cheerio'</span>);
+<span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'marked'</span>)).Renderer();
+
+renderer.blockquote = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(text)</span> </span>{
+    <span class="hljs-keyword">var</span> $ = cheerio.load(<span class="hljs-string">''</span> + text);
+    $(<span class="hljs-string">'p'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">if</span> ($(<span class="hljs-keyword">this</span>).text().indexOf(<span class="hljs-string">'--'</span>) === <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">var</span> html = $(<span class="hljs-keyword">this</span>).html().replace(<span class="hljs-string">'--'</span>, <span class="hljs-string">''</span>);
+            $(<span class="hljs-keyword">this</span>).replaceWith($(<span class="hljs-string">'&lt;footer&gt;'</span> + html + <span class="hljs-string">'&lt;/footer&gt;'</span>));
+        }
+    });
+    <span class="hljs-keyword">return</span> <span class="hljs-string">'&lt;blockquote&gt;'</span> + $.html() + <span class="hljs-string">'&lt;/blockquote&gt;'</span>;
+};
+</code></pre>
+<p>Here, we load the HTML into the cheerio parser, and then check each paragraph
+inside which starts with <code>--</code>. We then wrap that paragraph with the <code>&lt;footer&gt;</code>
+tag, and strip away the double dashes (which are replaced by a dash in the CSS).</p>
+<p>All we have to do now is pass that renderer to <a href="https://github.com/segmentio/metalsmith-markdown">metalsmith-markdown</a>:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> Metalsmith = <span class="hljs-built_in">require</span>(<span class="hljs-string">'metalsmith'</span>);
+<span class="hljs-keyword">var</span> markdown   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'metalsmith-markdown'</span>);
+
+Metalsmith(__dirname)
+    <span class="hljs-comment">// ...</span>
+    .use(markdown({ renderer: renderer }))
+    <span class="hljs-comment">// ...</span>
+    .build(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err)</span> </span>{
+        <span class="hljs-keyword">if</span> (err) {
+            <span class="hljs-keyword">throw</span> err;
+        }
+    });
+</code></pre>
+<p>We now have automatic <code>&lt;footer&gt;</code> generation for blockquotes, site-wide; and if
+the CSS framework is changed to one that does not require this tag, it is as
+easy to remove.</p>
+<p>Check out the full <a href="https://github.com/ben-eb/beneb.info/blob/master/gulpfile.js">build process for my blog</a>, which uses this technique.</p>
+]]></description><link>http://beneb.info/2015/02/more-powerful-markdown-with-custom-renderers</link><guid isPermaLink="true">http://beneb.info/2015/02/more-powerful-markdown-with-custom-renderers</guid><dc:creator><![CDATA[Ben Briggs]]></dc:creator><pubDate>Sat, 21 Feb 2015 00:00:00 GMT</pubDate></item><item><title><![CDATA[Automating coding style]]></title><description><![CDATA[<p>Coding style is important. So important, that people can be outright <em>religous</em>
+about what some may feel is insignificant. Tabs, or spaces? 2 space indent, or
+4? Do we keep the last line of a file, and what should happen to trailing spaces
+should they remain in our pristine source code? Of course, there are many
+opinions on the subject, but the one thing that has stuck with me is that any
+such style rules should be discussed with those who are coding the product, and
+then <em>set in stone and enforced by software</em>.</p>
+<blockquote><p>Working in a well-organized code base is like cooking in a clean kitchen. If
+things feel messy, it’s easy not to treat it with respect. If the formatting
+feels sloppy, it will tempt you to also be sloppy when it comes to readability,
+dependency management, and testing.</p>
+<footer> <a href="http://robots.thoughtbot.com/why-does-style-matter">Joe Ferris</a></footer>
+</blockquote><p>I found myself agreeing with many points raised in <a href="http://robots.thoughtbot.com/why-does-style-matter">Why Does Style Matter?</a>;
+indeed, I've discovered the benefits of consistent formatting only within the
+last few years. Code just looks <em>neater</em> when it is formatted consistently; if
+you write it the same way every time, people who are unfamiliar with your code
+won't get put off by the lack of consistency. As an example, this looks really
+messy:</p>
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
+    valid = validate_input(email.val(), <span class="hljs-string">'email address'</span>, {
+        required:<span class="hljs-literal">true</span>,
+        email:<span class="hljs-literal">true</span>
+    });
+    <span class="hljs-keyword">if</span> (!valid) {
+        validate_message(email,<span class="hljs-string">'#email-check'</span>,valid);
+    }
+    <span class="hljs-keyword">else</span> {
+        $.getJSON(<span class="hljs-string">"http://api.mywebsite.com/users/"</span> + email.val() + <span class="hljs-string">"?callback=?"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span> </span>{
+            <span class="hljs-keyword">if</span> (e.email===email.val()) {
+                validate_message(email,<span class="hljs-string">'#email-check'</span>,<span class="hljs-string">'Your email address is already registered!'</span>);
+            }
+            <span class="hljs-keyword">else</span>
+            {
+                validate_message(email,<span class="hljs-string">'#email-check'</span>,<span class="hljs-string">'OK'</span>);
+            }
+        });
+    }
+});
+</code></pre>
+<p>The lack of formatting consistency doesn't aid readability, especially in this
+jQuery soup. We can do a little better without having to change the logic in
+the code:</p>
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
+    valid = validateInput(email.val(), <span class="hljs-string">'email address'</span>, {
+        required: <span class="hljs-literal">true</span>,
+        email: <span class="hljs-literal">true</span>
+    });
+    <span class="hljs-keyword">if</span> (!valid) {
+        validateMessage(email, <span class="hljs-string">'#email-check'</span>, valid);
+    } <span class="hljs-keyword">else</span> {
+        $.getJSON(<span class="hljs-string">'http://api.website.com/users/'</span> + email.val() + <span class="hljs-string">'?callback=?'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> </span>{
+            <span class="hljs-keyword">if</span> (e.email === email.val()) {
+                validateMessage(email, <span class="hljs-string">'#email-check'</span>, <span class="hljs-string">'Your email address is already registered!'</span>);
+            } <span class="hljs-keyword">else</span> {
+                validateMessage(email, <span class="hljs-string">'#email-check'</span>, <span class="hljs-string">'OK'</span>);
+            }
+        });
+    }
+});
+</code></pre>
+<p>And it's better still if we were to change the logic around and reduce line
+length:</p>
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
+    <span class="hljs-keyword">var</span> endpoint = <span class="hljs-string">'http://api.website.com/users/'</span> + email.val() + <span class="hljs-string">'?callback=?'</span>;
+    <span class="hljs-keyword">var</span> message;
+    valid = validate_input(email.val(), <span class="hljs-string">'email address'</span>, {
+        required: <span class="hljs-literal">true</span>,
+        email: <span class="hljs-literal">true</span>
+    });
+
+    <span class="hljs-keyword">if</span> (valid) {
+        $.getJSON(endpoint, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> </span>{
+            <span class="hljs-keyword">if</span> (e.email === email.val()) {
+                message = <span class="hljs-string">'Your email address is already registered!'</span>;
+            } <span class="hljs-keyword">else</span> {
+                message = <span class="hljs-string">'OK'</span>;
+            }
+        });
+    } <span class="hljs-keyword">else</span> {
+        message = valid;
+    }
+
+    validateMessage(email, <span class="hljs-string">'#email-check'</span>, message);
+});
+</code></pre>
+<p>In most cases, work like this should be done by the developer writing the code;
+code review should be about finding issues with some code; whether it is a
+performance or maintenance concern, not taking the developer to task about their
+line lengths or repetitive code.</p>
+<p>But to me, a service like <a href="https://houndci.com/">Hound</a> doesn't appeal, for a number of reasons.
+The main one is just that its helpful suggestions come too late in the process.</p>
+<h2 id="set-and-forget">Set, and forget</h2>
+<p>Common tasks, such as removing trailing whitespace, setting line endings &amp;
+indentation size/character can be done whilst the file is being edited, using
+<a href="http://editorconfig.org/">EditorConfig</a>. The nice thing about this is that it is really easy to set up
+complex whitespace arrangements for different file types; say if you edit Ruby
+code and want to stick to their 2 space indent convention, but for your SCSS you
+want 4 spaces. It's easy to define an <code>.editorconfig</code> file for this purpose:</p>
+<pre><code class="lang-ini"># editorconfig.org
+<span class="hljs-setting">root = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
+
+<span class="hljs-title">[*]</span>
+<span class="hljs-setting">indent_style = <span class="hljs-value">space</span></span>
+<span class="hljs-setting">indent_size = <span class="hljs-value"><span class="hljs-number">2</span></span></span>
+<span class="hljs-setting">end_of_line = <span class="hljs-value">lf</span></span>
+<span class="hljs-setting">charset = <span class="hljs-value">utf-<span class="hljs-number">8</span></span></span>
+<span class="hljs-setting">trim_trailing_whitespace = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
+<span class="hljs-setting">insert_final_newline = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
+
+# 4 space indentation just for CSS
+<span class="hljs-title">[*.scss]</span>
+<span class="hljs-setting">indent_size = <span class="hljs-value"><span class="hljs-number">4</span></span></span>
+</code></pre>
+<p>With EditorConfig plugins, your text editor can always respect the project's
+code style decisions, &amp; you can have different setups for each project, if you
+so wish.</p>
+<h2 id="more-than-just-whitespace">More than just whitespace</h2>
+<p>But why stop at whitespace? Tools such as <a href="http://eslint.org/">ESLint</a> can check our source code
+for programmatic &amp; stylistic errors. Want all of your variable and function
+names in <code>camelCase</code>? <a href="http://eslint.org/docs/rules/camelcase.html">There's an option for that</a>, and many others; the
+advantage of using these is that your computer is always analysing what you
+write, <em>as you write it</em>; mistakes can be fixed immediately, then and there.</p>
+<p>For the perfectionist in us, there exists <a href="http://jscs.info/">JSCS</a>; an extremely thorough code
+style validator. Although it may seem a little daunting, it works best when
+starting a new project from scratch; using it on your existing projects may lead
+to you feeling overwhelmed.</p>
+<p>Why wait to push your code to GitHub before a computer tells you that it could
+be improved upon?</p>
+]]></description><link>http://beneb.info/2015/02/automating-coding-style</link><guid isPermaLink="true">http://beneb.info/2015/02/automating-coding-style</guid><dc:creator><![CDATA[Ben Briggs]]></dc:creator><pubDate>Fri, 13 Feb 2015 00:00:00 GMT</pubDate></item><item><title><![CDATA[Better ampersands & how to achieve them with unicode range]]></title><description><![CDATA[<p>Recently, I discovered <a href="http://24ways.org/2011/creating-custom-font-stacks-with-unicode-range/">this article on unicode-range</a>—it was
+definitely worth a read. While Firefox <em>still doesn't support this technique</em>
+(it's coming in version 36), one of the things that I found really interesting
+about it was that it is possible to do this sort of thing <em>in text</em>. It feels
+really wrong doing this:</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-title">h1</span>&gt;</span>Some title <span class="hljs-tag">&lt;<span class="hljs-title">span</span> <span class="hljs-attribute">class</span>=<span class="hljs-value">"amp"</span>&gt;</span>&amp;amp;<span class="hljs-tag">&lt;/<span class="hljs-title">span</span>&gt;</span> some other stuff<span class="hljs-tag">&lt;/<span class="hljs-title">h1</span>&gt;</span>
+</code></pre>
+<p>On a blog such as this one which uses Markdown for publishing, it's much cleaner
+to write this:</p>
+<pre><code class="lang-markdown"><span class="hljs-header"># Some title &amp; some other stuff</span>
+</code></pre>
+<p>That way, if the design is updated and the custom ampersands do not fit into the
+new look, the CSS can be removed &amp; nothing else has to change!</p>
+<p>Essentially the gist of the article is that you can specify a local font to use
+as an ampersand, then override it in Firefox. I am using this technique on this
+blog, but instead of using Arial as a fallback, I wanted to use the fonts that
+I already had in place. The code, then, is slightly more verbose:</p>
+<pre><code class="lang-css"><span class="hljs-comment">/* Load the web fonts */</span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Oxygen</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-style</span>:<span class="hljs-value"> normal</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
+         <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Bitter</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-style</span>:<span class="hljs-value"> normal</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
+         <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-comment">/* Load the ampersand override */</span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-comment">/* Load the ampersand fallback */</span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-style</span>:<span class="hljs-value"> normal</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
+         <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">270</span>C</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-style</span>:<span class="hljs-value"> normal</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
+         <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
+    <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value">U+<span class="hljs-number">270</span>C</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-comment">/* Apply the fonts to body copy and headings */</span>
+
+<span class="hljs-tag">body</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand, Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-tag">h1</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings, Bitter, Georgia, Times New Roman, Times, serif</span></span>;
+<span class="hljs-rule">}</span></span>
+</code></pre>
+<p>This way means that you can have a nice custom ampersand in supported browsers,
+&amp; in Firefox the ampersand will gracefully degrade back to the webfont it was
+already using.</p>
+]]></description><link>http://beneb.info/2015/02/better-ampersands-how-to-achieve-them-with-unicode-range</link><guid isPermaLink="true">http://beneb.info/2015/02/better-ampersands-how-to-achieve-them-with-unicode-range</guid><dc:creator><![CDATA[Ben Briggs]]></dc:creator><pubDate>Thu, 05 Feb 2015 00:00:00 GMT</pubDate></item><item><title><![CDATA[Taming the Beast: Optimising Bootstrap 3]]></title><description><![CDATA[<p>One of the great things about <a href="http://getbootstrap.com">Bootstrap</a> is that it
+offers a strong foundation on which to build a website or web application. The
+documentation is extensive, it offers many components for common use cases, and
+it lends itself to rapid development. However, when deploying to production, it
+can seem less appealing. CSS files produced by Bootstrap tend to be over 100KB,
+and that's <em>before</em> you start adding your own custom rules. Especially when
+developing a small website, it is unlikely that you'll need all of the elements
+that it has to offer.</p>
+<p>In this post we'll look at what measures we can take to reduce Bootstrap 3 down
+to only its necessary elements. Your mileage may vary, depending on how much of
+the framework you use; and to get the most out of Bootstrap you should be using
+a CSS preprocessor. Bootstrap is written in Less but there is also a
+<a href="https://github.com/twbs/bootstrap-sass">Sass port</a>, which I will be referencing in this article. Also note
+that some of these techniques are equally applicable to other CSS frameworks.</p>
+<h2 id="put-down-pre-packaged-builds-hello-sass-">Put down pre-packaged builds. Hello Sass.</h2>
+<p>One of the first things we need to start with is customising our own version of
+Bootstrap 3. To get the most out of our stylesheets, we shouldn't be using
+pre-packaged builds that third parties provide to us as a convenience; they
+encourage us to put their CDN links first and then override the styling with our
+own rules. Unfortunately this means that we miss out on one of the best features
+of Bootstrap; its <em>customisability</em>.</p>
+<p>However, this does not mean that we should all jump on over to
+<a href="http://getbootstrap.com/customize/">the customise page for Bootstrap</a>,
+with its myriad options. The likelihood is that all of the hex colours/font
+sizes that you input there will be consistent with other, custom components that
+you write yourself. Therefore, you should be defining them in your Sass files
+instead, making them reusable and easily modifiable.</p>
+<p>The first step is to <a href="https://github.com/twbs/bootstrap-sass">install the Sass version of Bootstrap</a>. With
+<a href="http://bower.io">Bower</a>, we can simply do:</p>
+<pre><code class="lang-sh">$ bower install bootstrap-sass-official
+</code></pre>
+<p>Next, we need to load it into our Sass files. But hold on; we need to start
+writing a <em>build process</em> which will end up handling all of our compilation and
+optimisation tasks, and ensure that we have a customised build of Bootstrap for
+our production site. For tasks such as these, <a href="http://gulpjs.com">gulp</a> suits
+the job perfectly as a sequence of transformations can be applied to our CSS in
+memory. Once you have installed gulp globally, then install the other
+dependencies from npm:</p>
+<pre><code class="lang-sh">$ npm install gulp gulp-ruby-sass@<span class="hljs-number">1.0</span>.<span class="hljs-number">0</span>-alpha chalk --save-dev
+</code></pre>
+<p>Our first iteration of our Sass task should just take the source files from the
+<code>styles</code> directory, compile them into CSS and then write them to a destination.
+In addition, if there were any errors, log them to the console:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> chalk = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chalk'</span>),
+    gulp  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp'</span>),
+    sass  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<p>We define a <code>loadPath</code> here so that we can import Bootstrap into our stylesheets.
+So, in the <code>./styles</code> directory, create a new file called <code>main.scss</code> and write:</p>
+<pre><code class="lang-scss"><span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">'bootstrap'</span>;</span>
+</code></pre>
+<p>Now, when we run <code>gulp styles</code>, we will have the full Bootstrap 3 source code in
+the <code>./build/css</code> directory. We are ready to start optimising.</p>
+<h2 id="method-1-include-only-necessary-components">Method 1: Include only necessary components</h2>
+<p>The simplest way to trim down the framework is just simply to customise which
+<code>@import</code> statements that you carry over into your main CSS file. You can do
+this by changing the contents of <code>main.scss</code> to something like this:</p>
+<pre><code class="lang-scss"><span class="hljs-comment">// Core variables and mixins</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/variables"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;</span>
+
+<span class="hljs-comment">// Reset and dependencies</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;</span>
+
+<span class="hljs-comment">// Core CSS</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/scaffolding"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/type"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/code"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/grid"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tables"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/forms"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/buttons"</span>;</span>
+
+<span class="hljs-comment">// Components</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/component-animations"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/dropdowns"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/button-groups"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/input-groups"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navs"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navbar"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/breadcrumbs"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pagination"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pager"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/labels"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/badges"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/jumbotron"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/thumbnails"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/alerts"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/progress-bars"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/media"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/list-group"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/panels"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-embed"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/wells"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/close"</span>;</span>
+
+<span class="hljs-comment">// Components w/ JavaScript</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/modals"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tooltip"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/popovers"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/carousel"</span>;</span>
+
+<span class="hljs-comment">// Utility classes</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/utilities"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-utilities"</span>;</span>
+</code></pre>
+<p>Lets say that you aren't going to use the JS components in your application.
+Well, just simply delete the relevant <code>@import</code> statements, and already your
+build is looking smaller. But, six months later on, you may want to add some of
+these back in to your build, as your requirements may change, so this approach
+may not scale well.</p>
+<h2 id="method-2-use-uncss-to-determine-which-classes-are-being-used">Method 2: Use UnCSS to determine which classes are being used</h2>
+<p>A more scalable version of the above is to use UnCSS, a tool that find unused
+CSS rules by analysing them against the HTML of your website. I wrote a
+<a href="https://github.com/ben-eb/gulp-uncss">gulp plugin for UnCSS</a> which allows us to do the same thing in our
+build:</p>
+<pre><code class="lang-sh">$ npm install gulp-uncss --save-dev
+</code></pre>
+<p>Depending on the size of your site, it probably won't be feasible to run this
+tool whilst you are developing. Instead, have a separate UnCSS task that you can
+run before deploying to production, like so:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> uncss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
+
+gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
+        .pipe(uncss({
+            html: [<span class="hljs-string">'./build/**/*.html'</span>]
+        }))
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<p>Note that UnCSS does not detect classes that are added by user interaction, so
+if you are to use any JavaScript components from the framework then
+<a href="https://github.com/ben-eb/gulp-uncss">you must pass an <code>ignore</code> list</a> to UnCSS. Even so, especially on
+small sites, UnCSS makes a huge difference to the size of the output file.</p>
+<h2 id="method-3-use-combine-mq-to-eliminate-duplication-of-media-queries">Method 3: Use combine-mq to eliminate duplication of media queries</h2>
+<p>Because of Bootstrap's expansive size, its CSS rules must be grouped together
+into logical components; this is also true of the media query selectors that it
+uses. There are many media query breakpoints that are repeated over and over,
+adding weight to the CSS file. To optimise this, we can use
+<a href="https://github.com/frontendfriends/gulp-combine-mq">gulp-combine-mq</a>, which will remove duplicates.</p>
+<pre><code class="lang-sh">$ npm install gulp-combine-mq --save-dev
+</code></pre>
+<p>We'll add this to our default styles task:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> combinemq = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(combinemq())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<h2 id="method-4-use-autoprefixer-to-include-only-necessary-vendor-prefixes">Method 4: Use autoprefixer to include only necessary vendor prefixes</h2>
+<p>Autoprefixer is a tool that adds vendor prefixes to unprefixed CSS properties,
+and is based on the excellent <a href="http://caniuse.com/">Can I use...</a> database. This means that
+we only have to include prefixes for browsers that still need them, and
+redundant properties are dropped from the resulting stylesheet. So, in a few
+years time, when Browser X supports a feature unprefixed and usage of the older
+versions declines to a less than relevant installed percentage, Autoprefixer
+will know to not supply the prefix for that browser. It also means that when
+authoring your SCSS, you don't need to write the vendor prefixes yourself. It's
+an easy win.</p>
+<pre><code class="lang-sh">$ npm install gulp-autoprefixer --save-dev
+</code></pre>
+<p>Again, add this to the default styles task:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> autoprefixer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(autoprefixer())
+        .pipe(combinemq())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<h2 id="method-5-use-variables-for-customising-rather-than-writing-more-selectors">Method 5: Use variables for customising, rather than writing more selectors</h2>
+<p>Let us return to customisability. Writing more selectors for Bootstrap to define
+things like a different button colour, or a different form control style can
+lead to bloat. Instead, before we do any of that, we should customise the base
+framework and only include our own custom components when necessary. At this
+point, I like to extract the variables part of <code>main.scss</code> out into its own file -
+so that <code>main.scss</code> now looks like this:</p>
+<pre><code class="lang-scss"><span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"variables"</span>;</span>
+
+<span class="hljs-comment">// Reset and dependencies</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;</span>
+
+<span class="hljs-comment">// ... etc</span>
+</code></pre>
+<p>And then, we can have a <code>_variables.scss</code> file in which variables are defined:</p>
+<pre><code class="lang-scss"><span class="hljs-variable">$body-bg</span><span class="hljs-value">: <span class="hljs-hexcolor">#000</span>;</span>
+<span class="hljs-variable">$text-color</span><span class="hljs-value">: <span class="hljs-hexcolor">#fff</span>;</span>
+
+<span class="hljs-comment">// Core variables and mixins</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/variables"</span>;</span>
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;</span>
+</code></pre>
+<p>This code customises Bootstrap with a black background and white text, without
+us having to write another selector. For simple customisations like this, have a
+look in your copy of <a href="https://github.com/twbs/bootstrap-sass">Bootstrap Sass</a> for the <code>_variables.scss</code> file.
+In here you will find all of the variables so that you can change the appearance
+of Bootstrap to your liking.</p>
+<h2 id="method-6-get-a-good-minifier">Method 6: Get a <em>good</em> minifier</h2>
+<p>There exist a plethora of CSS minification tools for JavaScript. In my opinion,
+the best ones offer selector and declaration consolidation; such that CSS like
+this:</p>
+<pre><code class="lang-css"><span class="hljs-tag">body</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value"> red</span></span>;
+<span class="hljs-rule">}</span></span>
+
+<span class="hljs-tag">body</span> <span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"> <span class="hljs-hexcolor">#fff</span></span></span>;
+<span class="hljs-rule">}</span></span>
+</code></pre>
+<p>Will be minified to this:</p>
+<pre><code class="lang-css"><span class="hljs-tag">body</span><span class="hljs-rules">{<span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value">red</span></span>;<span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"><span class="hljs-hexcolor">#fff</span></span></span></span>}
+</code></pre>
+<p>This is useful when you are using a framework; what happens if you need to add a
+property to an element/class that already exists in Bootstrap, but can't edit
+the Sass file for obvious future compatibility reasons? Well, you can let a
+minifier do the work for you. <a href="https://github.com/ben-eb/gulp-css-condense">gulp-css-condense</a> uses these
+techniques to minimise your CSS structure. Other good minifiers include
+<a href="https://github.com/ben-eb/gulp-csso">gulp-csso</a>, <a href="https://github.com/ben-eb/gulp-more-css">gulp-more-css</a> and
+<a href="https://github.com/stoyan/cssshrink">gulp-cssshrink</a>.</p>
+<p>I've found that because each of these compressors offer different functionality,
+it's possible to extract the most compression out of your CSS by using multiple
+compressors. We can do that easily in gulp:</p>
+<pre><code class="lang-sh">$ npm install gulp-css-condense gulp-csso gulp-more-css gulp-cssshrink --save-dev
+</code></pre>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> cssc   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
+    csso   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-csso'</span>),
+    more   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
+    shrink = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(autoprefixer())
+        .pipe(combinemq())
+        .pipe(cssc())
+        .pipe(csso())
+        .pipe(more())
+        .pipe(shrink())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<p>Now, when we run the <code>styles</code> task, we will get a autoprefixed, media query
+combined, aggressively optimised CSS file. Great!</p>
+<h2 id="extracting-compression-methods-with-lazypipe">Extracting compression methods with lazypipe</h2>
+<p>We're not quite done here. You will notice that our UnCSS task does not run any
+of the minification tasks - because it isn't a minifier itself the output looks
+closer to the Sass as we started writing it, although the overall size is
+smaller. But wait, before you start copying and pasting the <code>pipe()</code> chain from
+the <code>styles</code> task, you can use <a href="https://github.com/OverZealous/lazypipe">lazypipe</a>!</p>
+<pre><code class="lang-sh">$ npm install lazypipe --save-dev
+</code></pre>
+<p>Using lazypipe allows us to create an immutable stream 'factory'. Basically it
+means we are creating a pipeline that we can hook into in our various gulp
+tasks. We can use it like so:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> cssOptim = lazypipe()
+    .pipe(cssc)
+    .pipe(csso)
+    .pipe(more)
+    .pipe(shrink);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(autoprefixer())
+        .pipe(combinemq())
+        .pipe(cssOptim())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<p>Note that we don't call the <code>cssOptim</code> function until we need it in our <code>styles</code>
+task. We can now reuse that pipeline for any other tasks that might want to
+process CSS, such as UnCSS. So our final gulpfile should look like this:</p>
+<pre><code class="lang-js"><span class="hljs-keyword">var</span> autoprefixer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>),
+    chalk        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chalk'</span>),
+    combinemq    = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>),
+    cssc         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
+    csso         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-csso'</span>),
+    lazypipe     = <span class="hljs-built_in">require</span>(<span class="hljs-string">'lazypipe'</span>),
+    more         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
+    gulp         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp'</span>),
+    sass         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>),
+    shrink       = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>),
+    uncss        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
+
+<span class="hljs-keyword">var</span> cssOptim = lazypipe()
+    .pipe(cssc)
+    .pipe(csso)
+    .pipe(more)
+    .pipe(shrink);
+
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
+        loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
+    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .pipe(autoprefixer())
+        .pipe(combinemq())
+        .pipe(cssOptim())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+
+gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
+        .pipe(uncss({
+            html: [<span class="hljs-string">'./build/**/*.html'</span>]
+        }))
+        .pipe(cssOptim())
+        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});
+</code></pre>
+<h2 id="putting-it-into-practice">Putting it into practice</h2>
+<p>Why blog about this kind of optimisation if its not something that you're going
+to use? So, behold! This blog is using all of the techniques covered in the
+article; pay attention to the CSS source code and you'll notice that there are
+many familiar styles in there to describe columns, and header navigation; but
+many of the helper classes and columns/components that are unused have been
+stripped away, leaving only what the blog needs.</p>
+<p>In closing, remember that although this article is focused on Bootstrap, these
+techniques can (and should!) be applied to CSS whereever it may be used. The
+amount of tooling that we can use to perfect our stylesheets should be taken
+advantage of, as every optimisation means a faster, better website experience
+for you and your users.</p>
+]]></description><link>http://beneb.info/2015/01/taming-the-beast-optimising-bootstrap-3</link><guid isPermaLink="true">http://beneb.info/2015/01/taming-the-beast-optimising-bootstrap-3</guid><dc:creator><![CDATA[Ben Briggs]]></dc:creator><pubDate>Thu, 22 Jan 2015 00:00:00 GMT</pubDate></item></channel></rss>
