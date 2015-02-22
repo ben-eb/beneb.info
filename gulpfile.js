@@ -15,6 +15,7 @@ var autoprefixer = require('gulp-autoprefixer'),
     drafts       = require('metalsmith-drafts'),
     ecstatic     = require('ecstatic'),
     excerpts     = require('metalsmith-excerpts'),
+    feed         = require('metalsmith-feed'),
     fs           = require('fs'),
     glob         = require('glob').sync,
     gulp         = require('gulp'),
@@ -178,7 +179,12 @@ gulp.task('uncss', function () {
 gulp.task('metalsmith', function (cb) {
     Metalsmith(__dirname)
     .metadata({
-        isDev: !settings.production
+        isDev: !settings.production,
+        site: {
+            title: 'Ben Briggs',
+            url: 'http://beneb.info',
+            author: 'Ben Briggs'
+        }
     })
     .clean(settings.production)
     .use(drafts())
@@ -196,7 +202,6 @@ gulp.task('metalsmith', function (cb) {
         }
     }))
     .use(markdown({ renderer: renderer }))
-    .use(excerpts())
     .use(highlight({
         scoped: 'pre code'
     }))
@@ -226,6 +231,8 @@ gulp.task('metalsmith', function (cb) {
             pattern: ':title'
         }))
     )
+    .use(feed({ collection: 'articles' }))
+    .use(excerpts())
     .use(templates('handlebars'))
     .use(htmlmin())
     .use(widow())
