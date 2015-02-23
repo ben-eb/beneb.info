@@ -113,7 +113,12 @@ Handlebars.registerHelper('link_to', function (href, title) {
 });
 
 Handlebars.registerHelper('link_to_permalink', function (href, title) {
-    return createAnchor(href, '#', 'Permanent link to \'' + title + '\'');
+    return new Handlebars.SafeString('<a href="' + (isURL(href) ? href : '/' + href) + '" title="Permanent link to \'' + title + '\'" class="label label-title">permalink</a>');
+    //return createAnchor(href, '#', 'Permanent link to \'' + title + '\'');
+});
+
+Handlebars.registerHelper('continue_reading', function (href, title) {
+    return createAnchor(href, 'Continue reading...', 'Permanent link to \'' + title + '\'');
 });
 
 Handlebars.registerHelper('link_to_topic', function (topic) {
@@ -235,7 +240,9 @@ gulp.task('metalsmith', function (cb) {
     .use(excerpts())
     .use(templates('handlebars'))
     .use(htmlmin())
-    .use(widow())
+    .use(widow({
+        selectors: 'h1 a,h2 a,article h2,h3 a, article h3,h4,h5,h6,p,li,blockquote,th,td,dt,dd'.split(',')
+    }))
     .build(cb);
 });
 

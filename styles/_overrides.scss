@@ -61,3 +61,19 @@ blockquote:before {
     line-height: 1;
     background: $link-color;
 }
+
+h1 .label-title, h3 .label-title {
+    font-size: .4em;
+    margin-left: 10px;
+}
+
+.label-title {
+    background: hsla(50, 95%, 70%, 1);
+    text-transform: uppercase;
+    font-variant: small-caps;
+    vertical-align: super;
+}
+
+.label-title[href]:hover, .label-title[href]:focus {
+    background-color: hsla(50, 100%, 70%, 1);
+}

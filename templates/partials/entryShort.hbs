@@ -2,7 +2,7 @@
     <div class="col-lg-9">
         <h3>
         {{#if link}}
-            {{ link_to link title }} <small>{{ link_to_permalink path title }}</small>
+            {{ link_to link title }} {{ link_to_permalink path title }}
         {{else}}
             {{ link_to path title }}
         {{/if}}
