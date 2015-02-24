@@ -191,7 +191,6 @@ gulp.task('metalsmith', function (cb) {
             author: 'Ben Briggs'
         }
     })
-    .clean(settings.production)
     .use(drafts())
     .use(collections({
         articles: {
