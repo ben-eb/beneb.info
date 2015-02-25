@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Ben Briggs]]></title><description><![CDATA[Ben Briggs]]></description><link>http://beneb.info</link><generator>metalsmith-feed</generator><lastBuildDate>Tue, 24 Feb 2015 12:11:08 GMT</lastBuildDate><atom:link href="http://beneb.info/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[Ben Briggs]]></author><item><title><![CDATA[prose.io]]></title><description><![CDATA[<p>Prose is a web based graphical user interface for writing posts in Markdown; it
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Ben Briggs]]></title><description><![CDATA[Ben Briggs]]></description><link>http://beneb.info</link><generator>metalsmith-feed</generator><lastBuildDate>Wed, 25 Feb 2015 14:12:20 GMT</lastBuildDate><atom:link href="http://beneb.info/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[Ben Briggs]]></author><item><title><![CDATA[csste.st]]></title><description><![CDATA[<p>How do you test CSS? Being a declarative language, when you say you want a
+heading to be blue, it is simple as writing <code>h1 { color: blue }</code>. But, even if
+changes that you make to your stylesheets may seem innocuous, they may lead to
+unintended, far-reaching consequences. This site has built up a collection of
+resources on best practices for testing CSS; from image diffing, to syntax
+linting. Definitely a great starting point for any front end developer.</p>
+]]></description><link>http://beneb.info/2015/02/csste-st</link><guid isPermaLink="true">http://beneb.info/2015/02/csste-st</guid><dc:creator><![CDATA[Ben Briggs]]></dc:creator><pubDate>Wed, 25 Feb 2015 00:00:00 GMT</pubDate></item><item><title><![CDATA[prose.io]]></title><description><![CDATA[<p>Prose is a web based graphical user interface for writing posts in Markdown; it
 is perfect for those who want to start writing a static blog, but want the rich
 editing functionality of a WYSIWYG editor. It gives you a clean, minimal
 environment for writing and previewing your articles, plus it is integrated with
