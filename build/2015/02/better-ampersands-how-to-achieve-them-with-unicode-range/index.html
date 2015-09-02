@@ -8,7 +8,7 @@
     <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Bitter</span></span>;
@@ -16,7 +16,7 @@
     <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Load the ampersand override */</span>
 
@@ -24,13 +24,13 @@
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Load the ampersand fallback */</span>
 
@@ -41,7 +41,7 @@
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">270</span>C</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
@@ -50,18 +50,18 @@
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value">U+<span class="hljs-number">270</span>C</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Apply the fonts to body copy and headings */</span>
 
 <span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand, Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-tag">h1</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings, Bitter, Georgia, Times New Roman, Times, serif</span></span>;
-<span class="hljs-rule">}</span></span>
-</code></pre><p>This way means that you can have a nice custom ampersand in supported browsers, &amp; in Firefox the ampersand will gracefully degrade back to the webfont it was already&nbsp;using.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">First&nbsp;published</h4><p class="meta-description--contents">Thursday, February 5th&nbsp;2015</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Last&nbsp;updated</h4><p class="meta-description--contents">Saturday, February 21st 2015, at&nbsp;16:09</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">2 min (341&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/typography" class="label label-default" title="Browse entries tagged with&nbsp;'typography'">typography</a></p></div></div></aside></div><div id="disqus_thread"></div><script type="text/javascript">/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+}</span>
+</code></pre><p>This way means that you can have a nice custom ampersand in supported browsers, &amp; in Firefox the ampersand will gracefully degrade back to the webfont it was already&nbsp;using.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">First&nbsp;published</h4><p class="meta-description--contents">Thursday, February 5th&nbsp;2015</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Last&nbsp;updated</h4><p class="meta-description--contents">Saturday, February 21st 2015, at&nbsp;16:11</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">2 min (341&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/typography" class="label label-default" title="Browse entries tagged with&nbsp;'typography'">typography</a></p></div></div></aside></div><div id="disqus_thread"></div><script type="text/javascript">/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
         var disqus_shortname = 'benebinfo'; // required: replace example with your forum shortname
 
         /* * * DON'T EDIT BELOW THIS LINE * * */

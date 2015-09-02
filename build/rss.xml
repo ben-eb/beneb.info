@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Ben Briggs]]></title><description><![CDATA[Ben Briggs]]></description><link>http://beneb.info</link><generator>metalsmith-feed</generator><lastBuildDate>Wed, 25 Feb 2015 14:12:20 GMT</lastBuildDate><atom:link href="http://beneb.info/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[Ben Briggs]]></author><item><title><![CDATA[csste.st]]></title><description><![CDATA[<p>How do you test CSS? Being a declarative language, when you say you want a
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Ben Briggs]]></title><description><![CDATA[Ben Briggs]]></description><link>http://beneb.info</link><generator>metalsmith-feed</generator><lastBuildDate>Wed, 02 Sep 2015 16:13:00 GMT</lastBuildDate><atom:link href="http://beneb.info/rss.xml" rel="self" type="application/rss+xml"/><author><![CDATA[Ben Briggs]]></author><item><title><![CDATA[csste.st]]></title><description><![CDATA[<p>How do you test CSS? Being a declarative language, when you say you want a
 heading to be blue, it is simple as writing <code>h1 { color: blue }</code>. But, even if
 changes that you make to your stylesheets may seem innocuous, they may lead to
 unintended, far-reaching consequences. This site has built up a collection of
@@ -53,9 +53,9 @@ for that:</p>
 <pre><code class="lang-js"><span class="hljs-keyword">var</span> cheerio  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'cheerio'</span>);
 <span class="hljs-keyword">var</span> renderer = <span class="hljs-keyword">new</span> (<span class="hljs-built_in">require</span>(<span class="hljs-string">'marked'</span>)).Renderer();
 
-renderer.blockquote = <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(text)</span> </span>{
+renderer.blockquote = <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">text</span>) </span>{
     <span class="hljs-keyword">var</span> $ = cheerio.load(<span class="hljs-string">''</span> + text);
-    $(<span class="hljs-string">'p'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+    $(<span class="hljs-string">'p'</span>).each(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
         <span class="hljs-keyword">if</span> ($(<span class="hljs-keyword">this</span>).text().indexOf(<span class="hljs-string">'--'</span>) === <span class="hljs-number">0</span>) {
             <span class="hljs-keyword">var</span> html = $(<span class="hljs-keyword">this</span>).html().replace(<span class="hljs-string">'--'</span>, <span class="hljs-string">''</span>);
             $(<span class="hljs-keyword">this</span>).replaceWith($(<span class="hljs-string">'&lt;footer&gt;'</span> + html + <span class="hljs-string">'&lt;/footer&gt;'</span>));
@@ -75,7 +75,7 @@ Metalsmith(__dirname)
     <span class="hljs-comment">// ...</span>
     .use(markdown({ renderer: renderer }))
     <span class="hljs-comment">// ...</span>
-    .build(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(err)</span> </span>{
+    .build(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">err</span>) </span>{
         <span class="hljs-keyword">if</span> (err) {
             <span class="hljs-keyword">throw</span> err;
         }
@@ -103,7 +103,7 @@ last few years. Code just looks <em>neater</em> when it is formatted consistentl
 you write it the same way every time, people who are unfamiliar with your code
 won't get put off by the lack of consistency. As an example, this looks really
 messy:</p>
-<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span>
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>)
 </span>{
     <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
     valid = validate_input(email.val(), <span class="hljs-string">'email address'</span>, {
@@ -114,7 +114,7 @@ messy:</p>
         validate_message(email,<span class="hljs-string">'#email-check'</span>,valid);
     }
     <span class="hljs-keyword">else</span> {
-        $.getJSON(<span class="hljs-string">"http://api.mywebsite.com/users/"</span> + email.val() + <span class="hljs-string">"?callback=?"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(e)</span> </span>{
+        $.getJSON(<span class="hljs-string">"http://api.mywebsite.com/users/"</span> + email.val() + <span class="hljs-string">"?callback=?"</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">e</span>) </span>{
             <span class="hljs-keyword">if</span> (e.email===email.val()) {
                 validate_message(email,<span class="hljs-string">'#email-check'</span>,<span class="hljs-string">'Your email address is already registered!'</span>);
             }
@@ -129,7 +129,7 @@ messy:</p>
 <p>The lack of formatting consistency doesn't aid readability, especially in this
 jQuery soup. We can do a little better without having to change the logic in
 the code:</p>
-<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
     valid = validateInput(email.val(), <span class="hljs-string">'email address'</span>, {
         required: <span class="hljs-literal">true</span>,
@@ -138,7 +138,7 @@ the code:</p>
     <span class="hljs-keyword">if</span> (!valid) {
         validateMessage(email, <span class="hljs-string">'#email-check'</span>, valid);
     } <span class="hljs-keyword">else</span> {
-        $.getJSON(<span class="hljs-string">'http://api.website.com/users/'</span> + email.val() + <span class="hljs-string">'?callback=?'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> </span>{
+        $.getJSON(<span class="hljs-string">'http://api.website.com/users/'</span> + email.val() + <span class="hljs-string">'?callback=?'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
             <span class="hljs-keyword">if</span> (e.email === email.val()) {
                 validateMessage(email, <span class="hljs-string">'#email-check'</span>, <span class="hljs-string">'Your email address is already registered!'</span>);
             } <span class="hljs-keyword">else</span> {
@@ -150,7 +150,7 @@ the code:</p>
 </code></pre>
 <p>And it's better still if we were to change the logic around and reduce line
 length:</p>
-<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+<pre><code class="lang-js">$(<span class="hljs-string">'#email'</span>).blur(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">var</span> email = $(<span class="hljs-keyword">this</span>);
     <span class="hljs-keyword">var</span> endpoint = <span class="hljs-string">'http://api.website.com/users/'</span> + email.val() + <span class="hljs-string">'?callback=?'</span>;
     <span class="hljs-keyword">var</span> message;
@@ -160,7 +160,7 @@ length:</p>
     });
 
     <span class="hljs-keyword">if</span> (valid) {
-        $.getJSON(endpoint, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">(e)</span> </span>{
+        $.getJSON(endpoint, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) </span>{
             <span class="hljs-keyword">if</span> (e.email === email.val()) {
                 message = <span class="hljs-string">'Your email address is already registered!'</span>;
             } <span class="hljs-keyword">else</span> {
@@ -187,10 +187,10 @@ indentation size/character can be done whilst the file is being edited, using
 complex whitespace arrangements for different file types; say if you edit Ruby
 code and want to stick to their 2 space indent convention, but for your SCSS you
 want 4 spaces. It's easy to define an <code>.editorconfig</code> file for this purpose:</p>
-<pre><code class="lang-ini"># editorconfig.org
+<pre><code class="lang-ini"><span class="hljs-comment"># editorconfig.org</span>
 <span class="hljs-setting">root = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
-
-<span class="hljs-title">[*]</span>
+<span class="hljs-title">
+[*]</span>
 <span class="hljs-setting">indent_style = <span class="hljs-value">space</span></span>
 <span class="hljs-setting">indent_size = <span class="hljs-value"><span class="hljs-number">2</span></span></span>
 <span class="hljs-setting">end_of_line = <span class="hljs-value">lf</span></span>
@@ -198,7 +198,7 @@ want 4 spaces. It's easy to define an <code>.editorconfig</code> file for this p
 <span class="hljs-setting">trim_trailing_whitespace = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
 <span class="hljs-setting">insert_final_newline = <span class="hljs-value"><span class="hljs-keyword">true</span></span></span>
 
-# 4 space indentation just for CSS
+<span class="hljs-comment"># 4 space indentation just for CSS</span>
 <span class="hljs-title">[*.scss]</span>
 <span class="hljs-setting">indent_size = <span class="hljs-value"><span class="hljs-number">4</span></span></span>
 </code></pre>
@@ -242,7 +242,7 @@ I already had in place. The code, then, is slightly more verbose:</p>
     <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Bitter</span></span>;
@@ -250,7 +250,7 @@ I already had in place. The code, then, is slightly more verbose:</p>
     <span class="hljs-rule"><span class="hljs-attribute">font-weight</span>:<span class="hljs-value"> <span class="hljs-number">400</span></span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Load the ampersand override */</span>
 
@@ -258,13 +258,13 @@ I already had in place. The code, then, is slightly more verbose:</p>
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">local</span>(Baskerville-italic), <span class="hljs-function">local</span>(Palatino), <span class="hljs-function">local</span>(Book Antiqua)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">26</span></span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Load the ampersand fallback */</span>
 
@@ -275,7 +275,7 @@ I already had in place. The code, then, is slightly more verbose:</p>
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/oxygen-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value"> U+<span class="hljs-number">270</span>C</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-at_rule">@<span class="hljs-keyword">font-face</span></span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings</span></span>;
@@ -284,17 +284,17 @@ I already had in place. The code, then, is slightly more verbose:</p>
     <span class="hljs-rule"><span class="hljs-attribute">src</span>:<span class="hljs-value"> <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff2) <span class="hljs-function">format</span>(<span class="hljs-string">"woff2"</span>),
          <span class="hljs-function">url</span>(../fonts/bitter-regular-webfont.woff) <span class="hljs-function">format</span>(<span class="hljs-string">"woff"</span>)</span></span>;
     <span class="hljs-rule"><span class="hljs-attribute">unicode-range</span>:<span class="hljs-value">U+<span class="hljs-number">270</span>C</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-comment">/* Apply the fonts to body copy and headings */</span>
 
 <span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand, Oxygen, Helvetica Neue, Helvetica, Arial, sans-serif</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-tag">h1</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">font-family</span>:<span class="hljs-value"> Ampersand Headings, Bitter, Georgia, Times New Roman, Times, serif</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 </code></pre>
 <p>This way means that you can have a nice custom ampersand in supported browsers,
 &amp; in Firefox the ampersand will gracefully degrade back to the webfont it was
@@ -346,7 +346,7 @@ In addition, if there were any errors, log them to the console:</p>
     gulp  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp'</span>),
     sass  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -431,7 +431,7 @@ tool whilst you are developing. Instead, have a separate UnCSS task that you can
 run before deploying to production, like so:</p>
 <pre><code class="lang-js"><span class="hljs-keyword">var</span> uncss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
 
-gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
         .pipe(uncss({
             html: [<span class="hljs-string">'./build/**/*.html'</span>]
@@ -454,7 +454,7 @@ adding weight to the CSS file. To optimise this, we can use
 <p>We'll add this to our default styles task:</p>
 <pre><code class="lang-js"><span class="hljs-keyword">var</span> combinemq = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -477,7 +477,7 @@ an easy win.</p>
 <p>Again, add this to the default styles task:</p>
 <pre><code class="lang-js"><span class="hljs-keyword">var</span> autoprefixer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -521,15 +521,15 @@ the best ones offer selector and declaration consolidation; such that CSS like
 this:</p>
 <pre><code class="lang-css"><span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value"> red</span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 
 <span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"> <span class="hljs-hexcolor">#fff</span></span></span>;
-<span class="hljs-rule">}</span></span>
+}</span>
 </code></pre>
 <p>Will be minified to this:</p>
-<pre><code class="lang-css"><span class="hljs-tag">body</span><span class="hljs-rules">{<span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value">red</span></span>;<span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"><span class="hljs-hexcolor">#fff</span></span></span></span>}
-</code></pre>
+<pre><code class="lang-css"><span class="hljs-tag">body</span><span class="hljs-rules">{<span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value">red</span></span>;<span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"><span class="hljs-hexcolor">#fff</span>}
+</span></span></span></code></pre>
 <p>This is useful when you are using a framework; what happens if you need to add a
 property to an element/class that already exists in Bootstrap, but can't edit
 the Sass file for obvious future compatibility reasons? Well, you can let a
@@ -547,7 +547,7 @@ compressors. We can do that easily in gulp:</p>
     more   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
     shrink = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -579,7 +579,7 @@ tasks. We can use it like so:</p>
     .pipe(more)
     .pipe(shrink);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -610,7 +610,7 @@ process CSS, such as UnCSS. So our final gulpfile should look like this:</p>
     .pipe(more)
     .pipe(shrink);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
@@ -620,7 +620,7 @@ gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"
         .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
 });
 
-gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-params">()</span> </span>{
+gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
         .pipe(uncss({
             html: [<span class="hljs-string">'./build/**/*.html'</span>]
