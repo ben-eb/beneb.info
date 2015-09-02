@@ -10,8 +10,6 @@ var autoprefixer = require('gulp-autoprefixer'),
     cheerio      = require('cheerio'),
     collections  = require('metalsmith-collections'),
     combinemq    = require('gulp-combine-mq'),
-    cssc         = require('gulp-css-condense'),
-    csso         = require('gulp-csso'),
     drafts       = require('metalsmith-drafts'),
     ecstatic     = require('ecstatic'),
     excerpts     = require('metalsmith-excerpts'),
@@ -24,16 +22,14 @@ var autoprefixer = require('gulp-autoprefixer'),
     htmlmin      = require('metalsmith-html-minifier'),
     http         = require('http'),
     isURL        = require('is-absolute-url'),
-    lazypipe     = require('lazypipe'),
     markdown     = require('metalsmith-markdown'),
     Metalsmith   = require('metalsmith'),
     minimist     = require('minimist'),
     moment       = require('moment'),
-    more         = require('gulp-more-css'),
+    nano         = require('gulp-cssnano'),
     path         = require('path'),
     permalinks   = require('metalsmith-permalinks'),
     sass         = require('gulp-ruby-sass'),
-    shrink       = require('gulp-cssshrink'),
     tags         = require('metalsmith-tags'),
     templates    = require('metalsmith-templates'),
     uncss        = require('gulp-uncss'),
@@ -145,16 +141,6 @@ Handlebars.registerHelper('copyright_year', function () {
 });
 
 /**
- * CSS Optimisation pipeline; just run all the minifiers!
- */
-
-var cssOptim = lazypipe()
-    //.pipe(csso)
-    .pipe(cssc)
-    //.pipe(shrink)
-    //.pipe(more);
-
-/**
  * Define our gulp tasks.
  * - watch: watch all files for changes, run the build directory in a static server
  * - uncss: not recommended usage during development, can be a slow task
@@ -177,7 +163,7 @@ gulp.task('uncss', function () {
         .pipe(uncss({
             html: ['./build/**/*.html']
         }))
-        .pipe(cssOptim())
+        .pipe(nano())
         .pipe(gulp.dest('./build/css'));
 });
 
@@ -252,7 +238,7 @@ gulp.task('styles', function () {
         .on('error', console.warn.bind(console, chalk.red('Sass Error\n')))
         .pipe(autoprefixer())
         .pipe(combinemq())
-        .pipe(cssOptim())
+        .pipe(nano())
         .pipe(gulp.dest(res('root') + '/css'));
 });
 
