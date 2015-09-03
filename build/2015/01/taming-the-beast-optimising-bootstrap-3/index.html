@@ -1,6 +1,4 @@
-<html><head><title>Taming the Beast: Optimising Bootstrap 3 | Ben Briggs - Front end developer</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/css/main.css"><link rel="alternate" type="application/rss+xml" title="Articles from Ben Briggs' personal blog" href="/rss.xml"></head><body><nav class="navbar navbar-default" role="navigation"><div class="container"><div class="navbar-header"><a class="navbar-brand" href="/">Ben Briggs</a></div></div></nav><div class="container"><div class="row"><h1 class="col-lg-12"><a href="/2015/01/taming-the-beast-optimising-bootstrap-3" title="Permanent link to 'Taming the Beast: Optimising Bootstrap 3'">Taming the Beast: Optimising Bootstrap&nbsp;3</a></h1></div><div class="row"><article class="col-lg-9"><p>One of the great things about <a href="http://getbootstrap.com">Bootstrap</a> is that it offers a strong foundation on which to build a website or web application. The documentation is extensive, it offers many components for common use cases, and it lends itself to rapid development. However, when deploying to production, it can seem less appealing. CSS files produced by Bootstrap tend to be over 100KB, and that's <em>before</em> you start adding your own custom rules. Especially when developing a small website, it is unlikely that you'll need all of the elements that it has to&nbsp;offer.</p><p>In this post we'll look at what measures we can take to reduce Bootstrap 3 down to only its necessary elements. Your mileage may vary, depending on how much of the framework you use; and to get the most out of Bootstrap you should be using a CSS preprocessor. Bootstrap is written in Less but there is also a <a href="https://github.com/twbs/bootstrap-sass">Sass port</a>, which I will be referencing in this article. Also note that some of these techniques are equally applicable to other CSS&nbsp;frameworks.</p><h2 id="put-down-pre-packaged-builds-hello-sass-">Put down pre-packaged builds. Hello&nbsp;Sass.</h2><p>One of the first things we need to start with is customising our own version of Bootstrap 3. To get the most out of our stylesheets, we shouldn't be using pre-packaged builds that third parties provide to us as a convenience; they encourage us to put their CDN links first and then override the styling with our own rules. Unfortunately this means that we miss out on one of the best features of Bootstrap; its&nbsp;<em>customisability</em>.</p><p>However, this does not mean that we should all jump on over to <a href="http://getbootstrap.com/customize/">the customise page for Bootstrap</a>, with its myriad options. The likelihood is that all of the hex colours/font sizes that you input there will be consistent with other, custom components that you write yourself. Therefore, you should be defining them in your Sass files instead, making them reusable and easily&nbsp;modifiable.</p><p>The first step is to <a href="https://github.com/twbs/bootstrap-sass">install the Sass version of Bootstrap</a>. With <a href="http://bower.io">Bower</a>, we can simply&nbsp;do:</p><pre><code class="lang-sh">$ bower install bootstrap-sass-official
-</code></pre><p>Next, we need to load it into our Sass files. But hold on; we need to start writing a <em>build process</em> which will end up handling all of our compilation and optimisation tasks, and ensure that we have a customised build of Bootstrap for our production site. For tasks such as these, <a href="http://gulpjs.com">gulp</a> suits the job perfectly as a sequence of transformations can be applied to our CSS in memory. Once you have installed gulp globally, then install the other dependencies from&nbsp;npm:</p><pre><code class="lang-sh">$ npm install gulp gulp-ruby-sass@<span class="hljs-number">1.0</span>.<span class="hljs-number">0</span>-alpha chalk --save-dev
-</code></pre><p>Our first iteration of our Sass task should just take the source files from the <code>styles</code> directory, compile them into CSS and then write them to a destination. In addition, if there were any errors, log them to the&nbsp;console:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> chalk = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chalk'</span>),
+<html><head><title>Taming the Beast: Optimising Bootstrap 3 | Ben Briggs - Front end developer</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/css/main.css"><link rel="alternate" type="application/rss+xml" title="Articles from Ben Briggs' personal blog" href="/rss.xml"></head><body><nav class="navbar navbar-default" role="navigation"><div class="container"><div class="navbar-header"><a class="navbar-brand" href="/">Ben Briggs</a></div></div></nav><div class="container"><div class="row"><h1 class="col-lg-12"><a href="/2015/01/taming-the-beast-optimising-bootstrap-3" title="Permanent link to 'Taming the Beast: Optimising Bootstrap 3'">Taming the Beast: Optimising Bootstrap&nbsp;3</a></h1></div><div class="row"><article class="col-lg-9"><p>One of the great things about <a href="http://getbootstrap.com">Bootstrap</a> is that it offers a strong foundation on which to build a website or web application. The documentation is extensive, it offers many components for common use cases, and it lends itself to rapid development. However, when deploying to production, it can seem less appealing. CSS files produced by Bootstrap tend to be over 100KB, and that&#39;s <em>before</em> you start adding your own custom rules. Especially when developing a small website, it is unlikely that you&#39;ll need all of the elements that it has to&nbsp;offer.</p><p>In this post we&#39;ll look at what measures we can take to reduce Bootstrap 3 down to only its necessary elements. Your mileage may vary, depending on how much of the framework you use; and to get the most out of Bootstrap you should be using a CSS preprocessor. Bootstrap is written in Less but there is also a <a href="https://github.com/twbs/bootstrap-sass">Sass port</a>, which I will be referencing in this article. Also note that some of these techniques are equally applicable to other CSS&nbsp;frameworks.</p><h2 id="put-down-pre-packaged-builds-hello-sass-">Put down pre-packaged builds. Hello&nbsp;Sass.</h2><p>One of the first things we need to start with is customising our own version of Bootstrap 3. To get the most out of our stylesheets, we shouldn&#39;t be using pre-packaged builds that third parties provide to us as a convenience; they encourage us to put their CDN links first and then override the styling with our own rules. Unfortunately this means that we miss out on one of the best features of Bootstrap; its&nbsp;<em>customisability</em>.</p><p>However, this does not mean that we should all jump on over to <a href="http://getbootstrap.com/customize/">the customise page for Bootstrap</a>, with its myriad options. The likelihood is that all of the hex colours/font sizes that you input there will be consistent with other, custom components that you write yourself. Therefore, you should be defining them in your Sass files instead, making them reusable and easily&nbsp;modifiable.</p><p>The first step is to <a href="https://github.com/twbs/bootstrap-sass">install the Sass version of Bootstrap</a>. With <a href="http://bower.io">Bower</a>, we can simply&nbsp;do:</p><pre><code class="lang-sh">$ <span class="hljs-keyword">bower </span>install <span class="hljs-keyword">bootstrap-sass-official</span></code></pre><p>Next, we need to load it into our Sass files. But hold on; we need to start writing a <em>build process</em> which will end up handling all of our compilation and optimisation tasks, and ensure that we have a customised build of Bootstrap for our production site. For tasks such as these, <a href="http://gulpjs.com">gulp</a> suits the job perfectly as a sequence of transformations can be applied to our CSS in memory. Once you have installed gulp globally, then install the other dependencies from&nbsp;npm:</p><pre><code class="lang-sh">$ npm install gulp gulp-ruby-sass@<span class="hljs-number">1.0</span><span class="hljs-number">.0</span>-alpha chalk --save-dev</code></pre><p>Our first iteration of our Sass task should just take the source files from the <code>styles</code> directory, compile them into CSS and then write them to a destination. In addition, if there were any errors, log them to the&nbsp;console:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> chalk = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chalk'</span>),
     gulp  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp'</span>),
     sass  = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>);
 
@@ -9,60 +7,56 @@ gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
     }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
         .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><p>We define a <code>loadPath</code> here so that we can import Bootstrap into our stylesheets. So, in the <code>./styles</code> directory, create a new file called <code>main.scss</code> and&nbsp;write:</p><pre><code class="lang-scss"><span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">'bootstrap'</span>;</span>
-</code></pre><p>Now, when we run <code>gulp styles</code>, we will have the full Bootstrap 3 source code in the <code>./build/css</code> directory. We are ready to start&nbsp;optimising.</p><h2 id="method-1-include-only-necessary-components">Method 1: Include only necessary&nbsp;components</h2><p>The simplest way to trim down the framework is just simply to customise which <code>@import</code> statements that you carry over into your main CSS file. You can do this by changing the contents of <code>main.scss</code> to something like&nbsp;this:</p><pre><code class="lang-scss"><span class="hljs-comment">// Core variables and mixins</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/variables"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;</span>
+});</code></pre><p>We define a <code>loadPath</code> here so that we can import Bootstrap into our stylesheets. So, in the <code>./styles</code> directory, create a new file called <code>main.scss</code> and&nbsp;write:</p><pre><code class="lang-scss"><span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">'bootstrap'</span></span>;</code></pre><p>Now, when we run <code>gulp styles</code>, we will have the full Bootstrap 3 source code in the <code>./build/css</code> directory. We are ready to start&nbsp;optimising.</p><h2 id="method-1-include-only-necessary-components">Method 1: Include only necessary&nbsp;components</h2><p>The simplest way to trim down the framework is just simply to customise which <code>@import</code> statements that you carry over into your main CSS file. You can do this by changing the contents of <code>main.scss</code> to something like&nbsp;this:</p><pre><code class="lang-scss"><span class="hljs-comment">// Core variables and mixins</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/variables"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;
 
 <span class="hljs-comment">// Reset and dependencies</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;
 
 <span class="hljs-comment">// Core CSS</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/scaffolding"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/type"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/code"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/grid"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tables"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/forms"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/buttons"</span>;</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/scaffolding"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/type"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/code"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/grid"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tables"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/forms"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/buttons"</span>;
 
 <span class="hljs-comment">// Components</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/component-animations"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/dropdowns"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/button-groups"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/input-groups"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navs"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navbar"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/breadcrumbs"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pagination"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pager"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/labels"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/badges"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/jumbotron"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/thumbnails"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/alerts"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/progress-bars"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/media"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/list-group"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/panels"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-embed"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/wells"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/close"</span>;</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/component-animations"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/dropdowns"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/button-groups"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/input-groups"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navs"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/navbar"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/breadcrumbs"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pagination"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/pager"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/labels"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/badges"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/jumbotron"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/thumbnails"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/alerts"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/progress-bars"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/media"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/list-group"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/panels"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-embed"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/wells"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/close"</span>;
 
 <span class="hljs-comment">// Components w/ JavaScript</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/modals"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tooltip"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/popovers"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/carousel"</span>;</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/modals"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/tooltip"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/popovers"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/carousel"</span>;
 
 <span class="hljs-comment">// Utility classes</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/utilities"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-utilities"</span>;</span>
-</code></pre><p>Lets say that you aren't going to use the JS components in your application. Well, just simply delete the relevant <code>@import</code> statements, and already your build is looking smaller. But, six months later on, you may want to add some of these back in to your build, as your requirements may change, so this approach may not scale&nbsp;well.</p><h2 id="method-2-use-uncss-to-determine-which-classes-are-being-used">Method 2: Use UnCSS to determine which classes are being&nbsp;used</h2><p>A more scalable version of the above is to use UnCSS, a tool that find unused CSS rules by analysing them against the HTML of your website. I wrote a <a href="https://github.com/ben-eb/gulp-uncss">gulp plugin for UnCSS</a> which allows us to do the same thing in our&nbsp;build:</p><pre><code class="lang-sh">$ npm install gulp-uncss --save-dev
-</code></pre><p>Depending on the size of your site, it probably won't be feasible to run this tool whilst you are developing. Instead, have a separate UnCSS task that you can run before deploying to production, like&nbsp;so:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> uncss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/utilities"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/responsive-utilities"</span>;</code></pre><p>Lets say that you aren&#39;t going to use the JS components in your application. Well, just simply delete the relevant <code>@import</code> statements, and already your build is looking smaller. But, six months later on, you may want to add some of these back in to your build, as your requirements may change, so this approach may not scale&nbsp;well.</p><h2 id="method-2-use-uncss-to-determine-which-classes-are-being-used">Method 2: Use UnCSS to determine which classes are being&nbsp;used</h2><p>A more scalable version of the above is to use UnCSS, a tool that find unused CSS rules by analysing them against the HTML of your website. I wrote a <a href="https://github.com/ben-eb/gulp-uncss">gulp plugin for UnCSS</a> which allows us to do the same thing in our&nbsp;build:</p><pre><code class="lang-sh">$ npm install gulp-uncss --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span></code></pre><p>Depending on the size of your site, it probably won&#39;t be feasible to run this tool whilst you are developing. Instead, have a separate UnCSS task that you can run before deploying to production, like&nbsp;so:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> uncss = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
 
 gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
     <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
@@ -70,121 +64,107 @@ gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function">
             html: [<span class="hljs-string">'./build/**/*.html'</span>]
         }))
         .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><p>Note that UnCSS does not detect classes that are added by user interaction, so if you are to use any JavaScript components from the framework then <a href="https://github.com/ben-eb/gulp-uncss">you must pass an <code>ignore</code> list</a> to UnCSS. Even so, especially on small sites, UnCSS makes a huge difference to the size of the output&nbsp;file.</p><h2 id="method-3-use-combine-mq-to-eliminate-duplication-of-media-queries">Method 3: Use combine-mq to eliminate duplication of media&nbsp;queries</h2><p>Because of Bootstrap's expansive size, its CSS rules must be grouped together into logical components; this is also true of the media query selectors that it uses. There are many media query breakpoints that are repeated over and over, adding weight to the CSS file. To optimise this, we can use <a href="https://github.com/frontendfriends/gulp-combine-mq">gulp-combine-mq</a>, which will remove&nbsp;duplicates.</p><pre><code class="lang-sh">$ npm install gulp-combine-mq --save-dev
-</code></pre><p>We'll add this to our default styles&nbsp;task:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> combinemq = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>);
+});</code></pre><p>Note that UnCSS does not detect classes that are added by user interaction, so if you are to use any JavaScript components from the framework then <a href="https://github.com/ben-eb/gulp-uncss">you must pass an <code>ignore</code> list</a> to UnCSS. Even so, especially on small sites, UnCSS makes a huge difference to the size of the output&nbsp;file.</p><h2 id="method-3-use-combine-mq-to-eliminate-duplication-of-media-queries">Method 3: Use combine-mq to eliminate duplication of media&nbsp;queries</h2><p>Because of Bootstrap&#39;s expansive size, its CSS rules must be grouped together into logical components; this is also true of the media query selectors that it uses. There are many media query breakpoints that are repeated over and over, adding weight to the CSS file. To optimise this, we can use <a href="https://github.com/frontendfriends/gulp-combine-mq">gulp-combine-mq</a>, which will remove&nbsp;duplicates.</p><pre><code class="lang-sh">$ npm install gulp-<span class="hljs-built_in">combine</span>-mq <span class="hljs-comment">--save-dev</span></code></pre><p>We&#39;ll add this to our default styles&nbsp;task:</p><pre><code class="lang-js">var combinemq = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, function () {
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
-    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
-        .pipe(combinemq())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><h2 id="method-4-use-autoprefixer-to-include-only-necessary-vendor-prefixes">Method 4: Use autoprefixer to include only necessary vendor&nbsp;prefixes</h2><p>Autoprefixer is a tool that adds vendor prefixes to unprefixed CSS properties, and is based on the excellent <a href="http://caniuse.com/">Can I use...</a> database. This means that we only have to include prefixes for browsers that still need them, and redundant properties are dropped from the resulting stylesheet. So, in a few years time, when Browser X supports a feature unprefixed and usage of the older versions declines to a less than relevant installed percentage, Autoprefixer will know to not supply the prefix for that browser. It also means that when authoring your SCSS, you don't need to write the vendor prefixes yourself. It's an easy&nbsp;win.</p><pre><code class="lang-sh">$ npm install gulp-autoprefixer --save-dev
-</code></pre><p>Again, add this to the default styles&nbsp;task:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> autoprefixer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>);
+    }).on(<span class="hljs-string">'error'</span>, console.<span class="hljs-keyword">warn</span>.<span class="hljs-keyword">bind</span>(console, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .<span class="hljs-keyword">pipe</span>(combinem<span class="hljs-string">q()</span>)
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});</code></pre><h2 id="method-4-use-autoprefixer-to-include-only-necessary-vendor-prefixes">Method 4: Use autoprefixer to include only necessary vendor&nbsp;prefixes</h2><p>Autoprefixer is a tool that adds vendor prefixes to unprefixed CSS properties, and is based on the excellent <a href="http://caniuse.com/">Can I use...</a> database. This means that we only have to include prefixes for browsers that still need them, and redundant properties are dropped from the resulting stylesheet. So, in a few years time, when Browser X supports a feature unprefixed and usage of the older versions declines to a less than relevant installed percentage, Autoprefixer will know to not supply the prefix for that browser. It also means that when authoring your SCSS, you don&#39;t need to write the vendor prefixes yourself. It&#39;s an easy&nbsp;win.</p><pre><code class="lang-sh">$ npm install gulp-autoprefixer --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span></code></pre><p>Again, add this to the default styles&nbsp;task:</p><pre><code class="lang-js">var autoprefixer = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, function () {
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
-    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
-        .pipe(autoprefixer())
-        .pipe(combinemq())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><h2 id="method-5-use-variables-for-customising-rather-than-writing-more-selectors">Method 5: Use variables for customising, rather than writing more&nbsp;selectors</h2><p>Let us return to customisability. Writing more selectors for Bootstrap to define things like a different button colour, or a different form control style can lead to bloat. Instead, before we do any of that, we should customise the base framework and only include our own custom components when necessary. At this point, I like to extract the variables part of <code>main.scss</code> out into its own file - so that <code>main.scss</code> now looks like&nbsp;this:</p><pre><code class="lang-scss"><span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"variables"</span>;</span>
+    }).on(<span class="hljs-string">'error'</span>, console.<span class="hljs-keyword">warn</span>.<span class="hljs-keyword">bind</span>(console, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .<span class="hljs-keyword">pipe</span>(autoprefixer())
+        .<span class="hljs-keyword">pipe</span>(combinem<span class="hljs-string">q()</span>)
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});</code></pre><h2 id="method-5-use-variables-for-customising-rather-than-writing-more-selectors">Method 5: Use variables for customising, rather than writing more&nbsp;selectors</h2><p>Let us return to customisability. Writing more selectors for Bootstrap to define things like a different button colour, or a different form control style can lead to bloat. Instead, before we do any of that, we should customise the base framework and only include our own custom components when necessary. At this point, I like to extract the variables part of <code>main.scss</code> out into its own file - so that <code>main.scss</code> now looks like&nbsp;this:</p><pre><code class="lang-scss">@<span class="hljs-keyword">import</span> <span class="hljs-string">"variables"</span>;
 
 <span class="hljs-comment">// Reset and dependencies</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;</span>
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/normalize"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/print"</span>;
+@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/glyphicons"</span>;
 
-<span class="hljs-comment">// ... etc</span>
-</code></pre><p>And then, we can have a <code>_variables.scss</code> file in which variables are&nbsp;defined:</p><pre><code class="lang-scss"><span class="hljs-variable">$body-bg</span><span class="hljs-value">: <span class="hljs-hexcolor">#000</span>;</span>
+<span class="hljs-comment">// ... etc</span></code></pre><p>And then, we can have a <code>_variables.scss</code> file in which variables are&nbsp;defined:</p><pre><code class="lang-scss"><span class="hljs-variable">$body-bg</span><span class="hljs-value">: <span class="hljs-hexcolor">#000</span>;</span>
 <span class="hljs-variable">$text-color</span><span class="hljs-value">: <span class="hljs-hexcolor">#fff</span>;</span>
 
 <span class="hljs-comment">// Core variables and mixins</span>
 <span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/variables"</span>;</span>
-<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;</span>
-</code></pre><p>This code customises Bootstrap with a black background and white text, without us having to write another selector. For simple customisations like this, have a look in your copy of <a href="https://github.com/twbs/bootstrap-sass">Bootstrap Sass</a> for the <code>_variables.scss</code> file. In here you will find all of the variables so that you can change the appearance of Bootstrap to your&nbsp;liking.</p><h2 id="method-6-get-a-good-minifier">Method 6: Get a <em>good</em>&nbsp;minifier</h2><p>There exist a plethora of CSS minification tools for JavaScript. In my opinion, the best ones offer selector and declaration consolidation; such that CSS like&nbsp;this:</p><pre><code class="lang-css"><span class="hljs-tag">body</span> <span class="hljs-rules">{
+<span class="hljs-at_rule">@<span class="hljs-keyword">import</span> <span class="hljs-string">"bootstrap/mixins"</span>;</span></code></pre><p>This code customises Bootstrap with a black background and white text, without us having to write another selector. For simple customisations like this, have a look in your copy of <a href="https://github.com/twbs/bootstrap-sass">Bootstrap Sass</a> for the <code>_variables.scss</code> file. In here you will find all of the variables so that you can change the appearance of Bootstrap to your&nbsp;liking.</p><h2 id="method-6-get-a-good-minifier">Method 6: Get a <em>good</em>&nbsp;minifier</h2><p>There exist a plethora of CSS minification tools for JavaScript. In my opinion, the best ones offer selector and declaration consolidation; such that CSS like&nbsp;this:</p><pre><code class="lang-css"><span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value"> red</span></span>;
 }</span>
 
 <span class="hljs-tag">body</span> <span class="hljs-rules">{
     <span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"> <span class="hljs-hexcolor">#fff</span></span></span>;
-}</span>
-</code></pre><p>Will be minified to&nbsp;this:</p><pre><code class="lang-css"><span class="hljs-tag">body</span><span class="hljs-rules">{<span class="hljs-rule"><span class="hljs-attribute">color</span>:<span class="hljs-value">red</span></span>;<span class="hljs-rule"><span class="hljs-attribute">background</span>:<span class="hljs-value"><span class="hljs-hexcolor">#fff</span>}
-</span></span></span></code></pre><p>This is useful when you are using a framework; what happens if you need to add a property to an element/class that already exists in Bootstrap, but can't edit the Sass file for obvious future compatibility reasons? Well, you can let a minifier do the work for you. <a href="https://github.com/ben-eb/gulp-css-condense">gulp-css-condense</a> uses these techniques to minimise your CSS structure. Other good minifiers include <a href="https://github.com/ben-eb/gulp-csso">gulp-csso</a>, <a href="https://github.com/ben-eb/gulp-more-css">gulp-more-css</a> and <a href="https://github.com/stoyan/cssshrink">gulp-cssshrink</a>.</p><p>I've found that because each of these compressors offer different functionality, it's possible to extract the most compression out of your CSS by using multiple compressors. We can do that easily in&nbsp;gulp:</p><pre><code class="lang-sh">$ npm install gulp-css-condense gulp-csso gulp-more-css gulp-cssshrink --save-dev
-</code></pre><pre><code class="lang-js"><span class="hljs-keyword">var</span> cssc   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
-    csso   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-csso'</span>),
-    more   = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
-    shrink = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>);
+}</span></code></pre><p>Will be minified to&nbsp;this:</p><pre><code class="lang-css"><span class="hljs-tag">body</span>{<span class="hljs-attribute">color</span>:red;<span class="hljs-attribute">background</span>:<span class="hljs-hexcolor">#fff</span>}</code></pre><p>This is useful when you are using a framework; what happens if you need to add a property to an element/class that already exists in Bootstrap, but can&#39;t edit the Sass file for obvious future compatibility reasons? Well, you can let a minifier do the work for you. <a href="https://github.com/ben-eb/gulp-css-condense">gulp-css-condense</a> uses these techniques to minimise your CSS structure. Other good minifiers include <a href="https://github.com/ben-eb/gulp-csso">gulp-csso</a>, <a href="https://github.com/ben-eb/gulp-more-css">gulp-more-css</a> and <a href="https://github.com/stoyan/cssshrink">gulp-cssshrink</a>.</p><p>I&#39;ve found that because each of these compressors offer different functionality, it&#39;s possible to extract the most compression out of your CSS by using multiple compressors. We can do that easily in&nbsp;gulp:</p><pre><code class="lang-sh">$ npm install gulp-css-condense gulp-csso gulp-more-css gulp-cssshrink --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span></code></pre><pre><code class="lang-js">var cssc   = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
+    csso   = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-csso'</span>),
+    more   = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
+    shrink = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, function () {
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
-    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
-        .pipe(autoprefixer())
-        .pipe(combinemq())
-        .pipe(cssc())
-        .pipe(csso())
-        .pipe(more())
-        .pipe(shrink())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><p>Now, when we run the <code>styles</code> task, we will get a autoprefixed, media query combined, aggressively optimised CSS file.&nbsp;Great!</p><h2 id="extracting-compression-methods-with-lazypipe">Extracting compression methods with&nbsp;lazypipe</h2><p>We're not quite done here. You will notice that our UnCSS task does not run any of the minification tasks - because it isn't a minifier itself the output looks closer to the Sass as we started writing it, although the overall size is smaller. But wait, before you start copying and pasting the <code>pipe()</code> chain from the <code>styles</code> task, you can use <a href="https://github.com/OverZealous/lazypipe">lazypipe</a>!</p><pre><code class="lang-sh">$ npm install lazypipe --save-dev
-</code></pre><p>Using lazypipe allows us to create an immutable stream 'factory'. Basically it means we are creating a pipeline that we can hook into in our various gulp tasks. We can use it like&nbsp;so:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> cssOptim = lazypipe()
-    .pipe(cssc)
-    .pipe(csso)
-    .pipe(more)
-    .pipe(shrink);
+    }).on(<span class="hljs-string">'error'</span>, console.<span class="hljs-keyword">warn</span>.<span class="hljs-keyword">bind</span>(console, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .<span class="hljs-keyword">pipe</span>(autoprefixer())
+        .<span class="hljs-keyword">pipe</span>(combinem<span class="hljs-string">q()</span>)
+        .<span class="hljs-keyword">pipe</span>(cssc())
+        .<span class="hljs-keyword">pipe</span>(csso())
+        .<span class="hljs-keyword">pipe</span>(more())
+        .<span class="hljs-keyword">pipe</span>(shrink())
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});</code></pre><p>Now, when we run the <code>styles</code> task, we will get a autoprefixed, media query combined, aggressively optimised CSS file.&nbsp;Great!</p><h2 id="extracting-compression-methods-with-lazypipe">Extracting compression methods with&nbsp;lazypipe</h2><p>We&#39;re not quite done here. You will notice that our UnCSS task does not run any of the minification tasks - because it isn&#39;t a minifier itself the output looks closer to the Sass as we started writing it, although the overall size is smaller. But wait, before you start copying and pasting the <code>pipe()</code> chain from the <code>styles</code> task, you can use <a href="https://github.com/OverZealous/lazypipe">lazypipe</a>!</p><pre><code class="lang-sh">$ npm install lazypipe --<span class="hljs-built_in">save</span>-<span class="hljs-built_in">dev</span></code></pre><p>Using lazypipe allows us to create an immutable stream &#39;factory&#39;. Basically it means we are creating a pipeline that we can hook into in our various gulp tasks. We can use it like&nbsp;so:</p><pre><code class="lang-js">var cssOptim = lazypipe()
+    .<span class="hljs-keyword">pipe</span>(cssc)
+    .<span class="hljs-keyword">pipe</span>(csso)
+    .<span class="hljs-keyword">pipe</span>(more)
+    .<span class="hljs-keyword">pipe</span>(shrink);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, function () {
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
-    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
-        .pipe(autoprefixer())
-        .pipe(combinemq())
-        .pipe(cssOptim())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><p>Note that we don't call the <code>cssOptim</code> function until we need it in our <code>styles</code> task. We can now reuse that pipeline for any other tasks that might want to process CSS, such as UnCSS. So our final gulpfile should look like&nbsp;this:</p><pre><code class="lang-js"><span class="hljs-keyword">var</span> autoprefixer = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>),
-    chalk        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'chalk'</span>),
-    combinemq    = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>),
-    cssc         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
-    csso         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-csso'</span>),
-    lazypipe     = <span class="hljs-built_in">require</span>(<span class="hljs-string">'lazypipe'</span>),
-    more         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
-    gulp         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp'</span>),
-    sass         = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>),
-    shrink       = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>),
-    uncss        = <span class="hljs-built_in">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
+    }).on(<span class="hljs-string">'error'</span>, console.<span class="hljs-keyword">warn</span>.<span class="hljs-keyword">bind</span>(console, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .<span class="hljs-keyword">pipe</span>(autoprefixer())
+        .<span class="hljs-keyword">pipe</span>(combinem<span class="hljs-string">q()</span>)
+        .<span class="hljs-keyword">pipe</span>(cssOptim())
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});</code></pre><p>Note that we don&#39;t call the <code>cssOptim</code> function until we need it in our <code>styles</code> task. We can now reuse that pipeline for any other tasks that might want to process CSS, such as UnCSS. So our final gulpfile should look like&nbsp;this:</p><pre><code class="lang-js">var autoprefixer = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-autoprefixer'</span>),
+    chalk        = <span class="hljs-keyword">require</span>(<span class="hljs-string">'chalk'</span>),
+    combinemq    = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-combine-mq'</span>),
+    cssc         = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-css-condense'</span>),
+    csso         = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-csso'</span>),
+    lazypipe     = <span class="hljs-keyword">require</span>(<span class="hljs-string">'lazypipe'</span>),
+    more         = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-more-css'</span>),
+    gulp         = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp'</span>),
+    sass         = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-ruby-sass'</span>),
+    shrink       = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-cssshrink'</span>),
+    uncss        = <span class="hljs-keyword">require</span>(<span class="hljs-string">'gulp-uncss'</span>);
 
-<span class="hljs-keyword">var</span> cssOptim = lazypipe()
-    .pipe(cssc)
-    .pipe(csso)
-    .pipe(more)
-    .pipe(shrink);
+var cssOptim = lazypipe()
+    .<span class="hljs-keyword">pipe</span>(cssc)
+    .<span class="hljs-keyword">pipe</span>(csso)
+    .<span class="hljs-keyword">pipe</span>(more)
+    .<span class="hljs-keyword">pipe</span>(shrink);
 
-gulp.task(<span class="hljs-string">'styles'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'styles'</span>, function () {
     <span class="hljs-keyword">return</span> sass(<span class="hljs-string">'./styles'</span>, {
         loadPath: <span class="hljs-string">'./vendor/bootstrap-sass/assets/stylesheets'</span>
-    }).on(<span class="hljs-string">'error'</span>, <span class="hljs-built_in">console</span>.warn.bind(<span class="hljs-built_in">console</span>, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
-        .pipe(autoprefixer())
-        .pipe(combinemq())
-        .pipe(cssOptim())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+    }).on(<span class="hljs-string">'error'</span>, console.<span class="hljs-keyword">warn</span>.<span class="hljs-keyword">bind</span>(console, chalk.red(<span class="hljs-string">'Sass Error\n'</span>)))
+        .<span class="hljs-keyword">pipe</span>(autoprefixer())
+        .<span class="hljs-keyword">pipe</span>(combinem<span class="hljs-string">q()</span>)
+        .<span class="hljs-keyword">pipe</span>(cssOptim())
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
 });
 
-gulp.task(<span class="hljs-string">'uncss'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+gulp.task(<span class="hljs-string">'uncss'</span>, function () {
     <span class="hljs-keyword">return</span> gulp.src(<span class="hljs-string">'./build/css/main.css'</span>)
-        .pipe(uncss({
+        .<span class="hljs-keyword">pipe</span>(uncss({
             html: [<span class="hljs-string">'./build/**/*.html'</span>]
         }))
-        .pipe(cssOptim())
-        .pipe(gulp.dest(<span class="hljs-string">'./build/css'</span>));
-});
-</code></pre><h2 id="putting-it-into-practice">Putting it into&nbsp;practice</h2><p>Why blog about this kind of optimisation if its not something that you're going to use? So, behold! This blog is using all of the techniques covered in the article; pay attention to the CSS source code and you'll notice that there are many familiar styles in there to describe columns, and header navigation; but many of the helper classes and columns/components that are unused have been stripped away, leaving only what the blog&nbsp;needs.</p><p>In closing, remember that although this article is focused on Bootstrap, these techniques can (and should!) be applied to CSS whereever it may be used. The amount of tooling that we can use to perfect our stylesheets should be taken advantage of, as every optimisation means a faster, better website experience for you and your&nbsp;users.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">First&nbsp;published</h4><p class="meta-description--contents">Thursday, January 22nd&nbsp;2015</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Last&nbsp;updated</h4><p class="meta-description--contents">Saturday, February 21st 2015, at&nbsp;16:11</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">7 min (1945&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/gulpjs" class="label label-default" title="Browse entries tagged with 'gulpjs'">gulpjs</a> <a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/optimisation" class="label label-default" title="Browse entries tagged with 'optimisation'">optimisation</a> <a href="/topics/minify" class="label label-default" title="Browse entries tagged with&nbsp;'minify'">minify</a></p></div></div></aside></div><div id="disqus_thread"></div><script type="text/javascript">/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        .<span class="hljs-keyword">pipe</span>(cssOptim())
+        .<span class="hljs-keyword">pipe</span>(gulp.dest(<span class="hljs-string">'./build/css'</span>));
+});</code></pre><h2 id="putting-it-into-practice">Putting it into&nbsp;practice</h2><p>Why blog about this kind of optimisation if its not something that you&#39;re going to use? So, behold! This blog is using all of the techniques covered in the article; pay attention to the CSS source code and you&#39;ll notice that there are many familiar styles in there to describe columns, and header navigation; but many of the helper classes and columns/components that are unused have been stripped away, leaving only what the blog&nbsp;needs.</p><p>In closing, remember that although this article is focused on Bootstrap, these techniques can (and should!) be applied to CSS whereever it may be used. The amount of tooling that we can use to perfect our stylesheets should be taken advantage of, as every optimisation means a faster, better website experience for you and your&nbsp;users.</p></article><aside class="col-lg-3"><div class="row"><div class="col-sm-3 col-lg-12"><h4 class="meta-description">First&nbsp;published</h4><p class="meta-description--contents">Thursday, January 22nd&nbsp;2015</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Last&nbsp;updated</h4><p class="meta-description--contents">Saturday, February 21st 2015, at&nbsp;16:11</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Estimated reading&nbsp;time</h4><p class="meta-description--contents">7 min (1925&nbsp;words)</p></div><div class="col-sm-3 col-lg-12"><h4 class="meta-description">Topics</h4><p><a href="/topics/gulpjs" class="label label-default" title="Browse entries tagged with 'gulpjs'">gulpjs</a> <a href="/topics/css" class="label label-default" title="Browse entries tagged with 'css'">css</a> <a href="/topics/optimisation" class="label label-default" title="Browse entries tagged with 'optimisation'">optimisation</a> <a href="/topics/minify" class="label label-default" title="Browse entries tagged with&nbsp;'minify'">minify</a></p></div></div></aside></div><div id="disqus_thread"></div><script type="text/javascript">/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
         var disqus_shortname = 'benebinfo'; // required: replace example with your forum shortname
 
         /* * * DON'T EDIT BELOW THIS LINE * * */

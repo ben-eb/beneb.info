@@ -18,7 +18,6 @@ var autoprefixer = require('gulp-autoprefixer'),
     glob         = require('glob').sync,
     gulp         = require('gulp'),
     Handlebars   = require('handlebars'),
-    highlight    = require('metalsmith-code-highlight'),
     htmlmin      = require('metalsmith-html-minifier'),
     http         = require('http'),
     isURL        = require('is-absolute-url'),
@@ -29,6 +28,7 @@ var autoprefixer = require('gulp-autoprefixer'),
     nano         = require('gulp-cssnano'),
     path         = require('path'),
     permalinks   = require('metalsmith-permalinks'),
+    runSequence  = require('run-sequence'),
     sass         = require('gulp-ruby-sass'),
     tags         = require('metalsmith-tags'),
     templates    = require('metalsmith-templates'),
@@ -49,6 +49,12 @@ renderer.blockquote = function (text) {
         }
     });
     return '<blockquote>' + $.html() + '</blockquote>';
+};
+
+renderer.code = function (code, lang) {
+    return '<pre><code class="lang-' + lang + '">' +
+            require('highlight.js').highlightAuto(code).value +
+        '</code></pre>';
 };
 
 /**
@@ -191,10 +197,7 @@ gulp.task('metalsmith', function (cb) {
             pattern: 'topics/**/*'
         }
     }))
-    .use(markdown({ renderer: renderer }))
-    .use(highlight({
-        scoped: 'pre code'
-    }))
+    .use(markdown({renderer: renderer}))
     .use(wordcount())
     .use(tags({
         handle: 'tags',
@@ -228,7 +231,12 @@ gulp.task('metalsmith', function (cb) {
     .use(widow({
         selectors: 'h1 a,h2 a,article h2,h3 a, article h3,h4,h5,h6,p,li,blockquote,th,td,dt,dd'.split(',')
     }))
-    .build(cb);
+    .build(function (err) {
+        if (err) {
+            throw err;
+        }
+        cb();
+    });
 });
 
 gulp.task('styles', function () {
@@ -242,4 +250,6 @@ gulp.task('styles', function () {
         .pipe(gulp.dest(res('root') + '/css'));
 });
 
-gulp.task('compile', ['metalsmith', 'styles', 'uncss']);
+gulp.task('compile', function (callback) {
+    runSequence('metalsmith', 'styles', 'uncss', callback);
+});
