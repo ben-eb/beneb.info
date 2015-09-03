@@ -15,11 +15,11 @@ var autoprefixer = require('gulp-autoprefixer'),
     excerpts     = require('metalsmith-excerpts'),
     feed         = require('metalsmith-feed'),
     fs           = require('fs'),
-    glob         = require('glob').sync,
     gulp         = require('gulp'),
     Handlebars   = require('handlebars'),
     htmlmin      = require('metalsmith-html-minifier'),
     http         = require('http'),
+    inplace      = require('metalsmith-in-place'),
     isURL        = require('is-absolute-url'),
     markdown     = require('metalsmith-markdown'),
     Metalsmith   = require('metalsmith'),
@@ -84,12 +84,8 @@ var settings = minimist(process.argv.slice(2), {
 });
 
 /**
- * Handlebars partial registering/helper code
+ * Handlebars helpers
  */
-
-glob(__dirname + '/templates/partials/**/*.hbs').forEach(function (partial) {
-    Handlebars.registerPartial(path.basename(partial, '.hbs'), fs.readFileSync(partial, 'utf-8'));
-});
 
 function createAnchor (href, text, title) {
     if (typeof title !== 'string' && !isURL(href)) {
@@ -161,7 +157,7 @@ gulp.task('watch', function () {
     ).listen(8082);
 
     gulp.watch(res('mainCSS') + '/**/*.scss', ['styles']);
-    gulp.watch(['./src/**/*', './templates/**/*.hbs'], ['metalsmith']);
+    gulp.watch(['./src/**/*', './partials/**/*.hbs', './templates/**/*.hbs'], ['metalsmith']);
 });
 
 gulp.task('uncss', function () {
@@ -183,6 +179,10 @@ gulp.task('metalsmith', function (cb) {
             author: 'Ben Briggs'
         }
     })
+    .use(inplace({
+        engine: 'handlebars',
+        partials: 'partials'
+    }))
     .use(drafts())
     .use(collections({
         articles: {
