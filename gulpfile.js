@@ -14,7 +14,6 @@ var autoprefixer = require('gulp-autoprefixer'),
     ecstatic     = require('ecstatic'),
     excerpts     = require('metalsmith-excerpts'),
     feed         = require('metalsmith-feed'),
-    fs           = require('fs'),
     gulp         = require('gulp'),
     Handlebars   = require('handlebars'),
     htmlmin      = require('metalsmith-html-minifier'),
@@ -22,11 +21,10 @@ var autoprefixer = require('gulp-autoprefixer'),
     inplace      = require('metalsmith-in-place'),
     isURL        = require('is-absolute-url'),
     markdown     = require('metalsmith-markdown'),
-    Metalsmith   = require('metalsmith'),
+    metalsmith   = require('metalsmith'),
     minimist     = require('minimist'),
     moment       = require('moment'),
     nano         = require('gulp-cssnano'),
-    path         = require('path'),
     permalinks   = require('metalsmith-permalinks'),
     runSequence  = require('run-sequence'),
     sass         = require('gulp-ruby-sass'),
@@ -70,7 +68,7 @@ var res = (function () {
 
     return function (r) {
         return './' + resources[r];
-    }
+    };
 })();
 
 /**
@@ -170,7 +168,7 @@ gulp.task('uncss', function () {
 });
 
 gulp.task('metalsmith', function (cb) {
-    Metalsmith(__dirname)
+    metalsmith(__dirname)
     .metadata({
         isDev: !settings.production,
         site: {
